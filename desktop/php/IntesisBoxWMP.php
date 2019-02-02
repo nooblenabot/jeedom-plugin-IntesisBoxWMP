@@ -121,28 +121,43 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
 			<option value="TO-RC-WMP-1">{{Toshiba tout types (TO-RC)}}</option>
 		</select>
       </div>
+	</div>
+	<div class="form-group">
 		<label class="col-sm-3 control-label">{{Adresse IP}}</label>
 		<div class="col-sm-3">
-			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="IP" placeholder="exemple 122"/>
+			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="IP"/>
 		</div>
 	</div>
-   <!-- <div class="form-group">
+	<div class="form-group">
+		<label class="col-sm-3 control-label">{{Identifiant Climatiseur}}</label>
+		<div class="col-sm-3">
+			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="acNum" Value="1" disabled/>
+		</div>
+	</div>
+	<div class="form-group">
       <label class="col-sm-3 control-label" ></label>
       <div class="col-sm-9">
-        <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="fullMobileDisplay" />{{Affichage complet en mobile}}</label>
-        <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="modeImage" />{{Mode image}}</label>
+        <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="VANEUD" />{{Presence Volets UP/DONW}}</label>
+        <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="VANELR" />{{Presence Volets LEFT/RIGHT}}</label>
       </div>
+    </div>
+   <!-- <div class="form-group">
+		<label class="col-sm-3 control-label">{{Identifiant Climatiseur}}</label>
+		<div class="col-sm-3">
+			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="acNum" placeholder="exemple 1"/>
+		</div>
     </div>-->
   </fieldset>
 </form>
 <!--<div class="alert alert-info">{{Si vous venez de créer votre clé api il faut peut être patienter quelques heures avant qu'elle soit active (en attendant il peut y avoir une erreur d'authentification)}} </div>
-</div>-->
+-->
+</div>
 <div role="tabpanel" class="tab-pane" id="commandtab">
   <br/>
   <table id="table_cmd" class="table table-bordered table-condensed">
     <thead>
       <tr>
-        <th>{{Nom}}</th><th>{{Options}}</th><th></th>
+        <th>{{Nom}}</th><th>{{Options}}</th><th></th><th></th>
       </tr>
     </thead>
     <tbody>
