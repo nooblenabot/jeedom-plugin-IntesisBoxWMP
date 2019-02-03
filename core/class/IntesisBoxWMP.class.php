@@ -32,6 +32,10 @@ class IntesisBoxWMP extends eqLogic {
      */
 
 
+     /* Fonction exécutée automatiquement toutes les 15 minutes par Jeedom */
+      public static function cron15() {
+      }
+
     /*
      * Fonction exécutée automatiquement toutes les heures par Jeedom
       public static function cronHourly() {
@@ -241,48 +245,11 @@ class IntesisBoxWMPCmd extends cmd {
 					$delay=2;
 					$This->fclose($request_tcp)
 				} else if ($cmd == 'off') {
-					if ($eqLogic->getConfiguration('volumedefault')>0) {
-						$request_http = new com_http('http://' . $IP . self::URL_POST . '?'.(($zone=='')?'MV':$zone) .str_pad( $eqLogic->getConfiguration('volumedefault'), 2, "0", STR_PAD_LEFT ));
-						$this->http_exec_wrapper($request_http, 2);
-						sleep(1);
-					}
-					$request_http = new com_http('http://' . $IP . self::URL_POST . '?'.(($zone=='')?'PWSTANDBY':$zone.'OFF'));
-					$ret = $this->http_exec_wrapper($request_http, 4);
-					if ($ret) $delay=5;
-				} else if ($cmd == 'volume_set') {
-					$request_http = new com_http('http://' . $IP . self::URL_POST . '?'.(($zone=='')?'MV':$zone) .str_pad( min($_options['slider'],$eqLogic->getConfiguration('volumemax')), 2, "0", STR_PAD_LEFT ));
-					$request_http->exec();
-				} else if ( strpos($cmd, 'volume_set_') === 0) {
-					$request_http = new com_http('http://' . $IP . self::URL_POST . '?'.(($zone=='')?'MV':$zone) .str_pad( min(substr($cmd, -1),$eqLogic->getConfiguration('volumemax')), 2, "0", STR_PAD_LEFT ));
-					$request_http->exec();
-				} else if ($cmd == 'volume_up') {
-					$request_http = new com_http('http://' . $IP . self::URL_POST . '?'.(($zone=='')?'MV':$zone).'UP');
-					for ($i = 0; $i <= $eqLogic->getConfiguration('volumestep',1); $i++) {
-						$request_http->exec();
-						usleep(250000);
-					}
-				} else if ($cmd == 'volume_down') {
-					$request_http = new com_http('http://' . $IP . self::URL_POST . '?'.(($zone=='')?'MV':$zone).'DOWN');
-					for ($i = 0; $i <= $eqLogic->getConfiguration('volumestep',1); $i++) {
-						$request_http->exec();
-						usleep(250000);
-					}
-				} else if ($cmd == 'mute_on') {
 
-				} else if ( strpos($cmd, 'fav_') === 0) {	// is a fav call
-					$request_http = new com_http('http://' . $IP . self::URL_CALLFAVORITE . '?0' . substr($cmd, -1) );
-					$ret = $this->http_exec_wrapper($request_http, 2);
-					if ($ret===false) {	// alternative way of calling favorites (eg: for AVR)
-						$request_http = new com_http('http://' . $IP . self::URL_POST . '?'.(($zone=='')?'ZM':$zone).'FAVORITE'.substr($cmd, -1));
-						$request_http->exec();
-					}
-				} else if ($cmd == 'sleep') {
-					
 				} else if ($cmd == 'refresh' || $cmd == 'reachable') {
-					// do nothing
+					
 				} else {	// other commands
-					$request_http = new com_http('http://' . $IP . self::URL_POST . '?' . urlencode(strtoupper($cmd)) );
-					$request_http->exec();
+					
 				}
 				if ( $index==count($cmds) ) {	// update on last cmd
 					sleep(1+$delay);

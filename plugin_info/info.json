@@ -10,7 +10,7 @@
 	"hasOwnDeamon" : false,
 	"maxDependancyInstallTime" : 0,
 	"changelog" : "https://jeedom.github.io/plugin-template/#language#/changelog",
-	"documentation" : "https://jeedom.github.io/plugin-template/#language#/",
+	"documentation" : "https://github.com/nooblenabot/jeedom-plugin-IntesisBoxWMP/wiki",
 	"link" : {
 		"forum":"Lien vers le forum"
 	},

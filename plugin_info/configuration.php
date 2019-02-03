@@ -27,24 +27,9 @@ if (!isConnect()) {
         <div class="form-group">
             <label class="col-lg-4 control-label">{{Port de communication}}</label>
             <div class="col-lg-2">
-                <input class="configKey form-control" data-l1key="PortComm" value="3310" />
+                <input class="configKey form-control" data-l1key="PortComm" value="3310" placeholder="3310"/>
             </div>
         </div>
-     <!--   <div class="form-group">
-            <label class="col-lg-4 control-label">{{Global param 2}}</label>
-            <div class="col-lg-2">
-                <input class="configKey form-control" data-l1key="param2" value="80" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-lg-4 control-label">{{Global param 2}}</label>
-            <div class="col-lg-2">
-                <select class="configKey form-control" data-l1key="param3">
-                    <option value="value1">value1</option>
-                    <option value="value2">value2</option>
-                </select>
-            </div>
-        </div>-->
   </fieldset>
 </form>
 
