@@ -119,18 +119,18 @@ class IntesisBoxWMP extends eqLogic {
 		
 		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 		
-		$ip = $eqLogic->getConfiguration('ip');
-		$PortCom = $eqLogic->getConfiguration('PortCom');
-		$acNum = $eqLogic->getConfiguration('acNum');
+		$ip = $this->getConfiguration('ip');
+		$PortCom = $this->getConfiguration('portCom');
+		$acNum = $this->getConfiguration('acNum');
 		$delay=500;
 		/* $command = ('SET'$acNum':ONOFF,'$cmd); */
-		$param = $eqLogic->getConfiguration('param');
+		/*$param = $this->getConfiguration('param');*/
 		
-		if(socket_connect ($socket , $ip, $port))
+		if(socket_connect ($socket , $ip, $PortCom))
 		{
 			usleep($delay*1000);
 		
-			log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (IP : ' . $ip . ', PORT : ' . $port . ')');
+			log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (IP : ' . $ip . ', PORT : ' . $PortCom . ')');
 			
 			log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (' . $cmd . ')');
 			socket_write ($socket ,$cmd . "\r\n");
@@ -163,7 +163,7 @@ class IntesisBoxWMPCmd extends cmd {
     public function execute($_options = array()) {
         $command = $this->getConfiguration('ParamCmd');
 		$eqLogic = $this->getEqLogic();
-		$eqlogic->executeCommand($command);
+		$eqLogic->executeCommand($command);
 		}
     
     /*     * **********************Getteur Setteur*************************** */
