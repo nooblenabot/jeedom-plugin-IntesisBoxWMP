@@ -8,19 +8,24 @@ $eqLogics = eqLogic::byType($plugin->getId());
 ?>
 
 <div class="row row-overflow">
+
+<!-- volet deroulant gauche pour recherche rapide (pas utile)
   <div class="col-lg-2">
     <div class="bs-sidebar">
       <ul id="ul_eqLogic" class="nav nav-list bs-sidenav">
         <a class="btn btn-default eqLogicAction" style="width : 100%;margin-top : 5px;margin-bottom: 5px;" data-action="add"><i class="fa fa-plus-circle"></i> {{Ajouter un dispositif}}</a>
         <li class="filter" style="margin-bottom: 5px;"><input class="filter form-control input-sm" placeholder="{{Rechercher}}" style="width: 100%"/></li>
         <?php
+		/*
 foreach ($eqLogics as $eqLogic) {
 	echo '<li class="cursor li_eqLogic" data-eqLogic_id="' . $eqLogic->getId() . '"><a>' . $eqLogic->getHumanName(true) . '</a></li>';
 }
+*/
 ?>
      </ul>
    </div>
  </div>
+-->
  <div class="col-lg-10 col-md-9 col-sm-8 eqLogicThumbnailDisplay" style="border-left: solid 1px #EEE; padding-left: 25px;">
    <legend><i class="fa fa-cog"></i> {{Gestion}}</legend>
    <div class="eqLogicThumbnailContainer">
@@ -52,10 +57,10 @@ foreach ($eqLogics as $eqLogic) {
 </div>
 
 <div class="col-lg-10 col-md-9 col-sm-8 eqLogic" style="border-left: solid 1px #EEE; padding-left: 25px;display: none;">
+ <a class="btn btn-default eqLogicAction pull-right" data-action="configure"><i class="fa fa-cogs"></i> {{Configuration avancée}}</a>
  <a class="btn btn-success eqLogicAction pull-right" data-action="save"><i class="fa fa-check-circle"></i> {{Sauvegarder}}</a>
  <a class="btn btn-danger eqLogicAction pull-right" data-action="remove"><i class="fa fa-minus-circle"></i> {{Supprimer}}</a>
- <a class="btn btn-default eqLogicAction pull-right" data-action="configure"><i class="fa fa-cogs"></i> {{Configuration avancée}}</a>
- <ul class="nav nav-tabs" role="tablist">
+<ul class="nav nav-tabs" role="tablist">
    <li role="presentation"><a class="eqLogicAction cursor" aria-controls="home" role="tab" data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
    <li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fa fa-tachometer"></i> {{Equipement}}</a></li>
    <li role="presentation"><a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-list-alt"></i> {{Commandes}}</a></li>
@@ -112,6 +117,7 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
             <option value="DK-AC-WMP-1">{{Daikin types domestiques (DK-AC)}}</option>
             <option value="DK-RC-WMP-1">{{Daikin types VRV et SKY (DK-RC)}}</option>
 			<option value="FJ-RC-WMP-1">{{Fujitsu tout types (FJ-RC)}}</option>
+			<option value="FJ-AC-WMP-1">{{Fujitsu types domestiques (FJ-AC)}}</option>
 			<option value="LG-RC-WMP-1">{{LG tout types(LG-RC)}}</option>
 			<option value="ME-AC-WMP-1">{{Mitsubishi Electric tout types (ME-AC)}}</option>
 			<option value="MH-AC-WMP-1">{{Mitsubishi Heavy Industries types RAC (MH-AC)}}</option>
@@ -125,13 +131,17 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
 	<div class="form-group">
 		<label class="col-sm-3 control-label">{{Adresse IP}}</label>
 		<div class="col-sm-3">
-			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="IP"/>
+			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="ip"/>
+		</div>
+		<label class="col-sm-3 control-label">{{Port Communication}}</label>
+		<div class="col-sm-3">
+			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="portCom" Value="3310"/>
 		</div>
 	</div>
 	<div class="form-group">
 		<label class="col-sm-3 control-label">{{Identifiant Climatiseur}}</label>
 		<div class="col-sm-3">
-			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="acNum" Value="1" disabled/>
+			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="AcNum" Value="1"/>
 		</div>
 	</div>
 	<div class="form-group">
@@ -141,23 +151,22 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
         <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="VANELR" />{{Presence Volets LEFT/RIGHT}}</label>
       </div>
     </div>
-   <!-- <div class="form-group">
-		<label class="col-sm-3 control-label">{{Identifiant Climatiseur}}</label>
-		<div class="col-sm-3">
-			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="acNum" placeholder="exemple 1"/>
-		</div>
-    </div>-->
   </fieldset>
 </form>
 <!--<div class="alert alert-info">{{Si vous venez de créer votre clé api il faut peut être patienter quelques heures avant qu'elle soit active (en attendant il peut y avoir une erreur d'authentification)}} </div>
 -->
 </div>
 <div role="tabpanel" class="tab-pane" id="commandtab">
-  <br/>
+  <a class="btn btn-success btn-sm cmdAction pull-right" id="bt_addIntesisCMD" style="margin-top:5px;"><i class="fa fa-plus-circle"></i> {{Ajouter une commande}}</a><br/><br/>
   <table id="table_cmd" class="table table-bordered table-condensed">
     <thead>
       <tr>
-        <th>{{Nom}}</th><th>{{Options}}</th><th></th><th></th>
+        <th>#</th>
+		<th>{{Nom}}</th>
+		<th>{{Sous-Type}}</th>
+		<th>{{Commande}}</th>
+		<th>{{Options}}</th>
+		<th></th>
       </tr>
     </thead>
     <tbody>
