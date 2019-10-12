@@ -9,7 +9,7 @@
 	"hasDependency" : false,
 	"hasOwnDeamon" : false,
 	"maxDependancyInstallTime" : 0,
-	"pluginVersion" : "0.1",
+	"pluginVersion" : "0.1a",
 	"changelog" : "https://github.com/nooblenabot/jeedom-plugin-IntesisBoxWMP/wiki",
 	"documentation" : "https://jeedom.github.io/plugin-template/#language#/",
 	"link" : {

@@ -17,7 +17,7 @@
  */
 
 /* * ***************************Includes********************************* */
-require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
+require_once __DIR__ . '/../../../../core/php/core.inc.php';
 
 class IntesisBoxWMP extends eqLogic {
 	
@@ -105,26 +105,23 @@ class IntesisBoxWMP extends eqLogic {
 
     /*     * **********************Getteur Setteur*************************** */
 	
-	public function VerifyCommand () {
-		
-	}
 	
-		public function CreateCommand () {
+	public function CreateCommand ($Ordre = '',$OrdreType='') {
+		log::add('IntesisBoxWMP', 'debug', 'Construct ' . __FUNCTION__ .' / $Ordre = ' . $Ordre);
+		$AcNum = $this->getConfiguration('AcNum');
+      
+       	$command = $OrdreType.','.$AcNum.':'.$Ordre;
+		log::add('IntesisBoxWMP', 'debug', 'EndCreate ' . __FUNCTION__ .' / $command = ' . $command);
+		$this->executeCommand($command);
+		}
 		
-		
-	}
-	
 	public function executeCommand ($cmd = '') {
 		log::add('IntesisBoxWMP', 'debug', 'BEGIN ' . __FUNCTION__ .' / $cmd = ' . $cmd);
-		
 		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 		
 		$ip = $this->getConfiguration('ip');
 		$PortCom = $this->getConfiguration('portCom');
-		$acNum = $this->getConfiguration('acNum');
 		$delay=500;
-		/* $command = ('SET'$acNum':ONOFF,'$cmd); */
-		/*$param = $this->getConfiguration('param');*/
 		
 		if(socket_connect ($socket , $ip, $PortCom))
 		{
@@ -134,6 +131,7 @@ class IntesisBoxWMP extends eqLogic {
 			
 			log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (' . $cmd . ')');
 			socket_write ($socket ,$cmd . "\r\n");
+			
 			usleep(500000);
 			log::add('IntesisBoxWMP', 'debug', 'CLOSING CONNECTION');
 			socket_close($socket);
@@ -161,9 +159,25 @@ class IntesisBoxWMPCmd extends cmd {
      */
  
     public function execute($_options = array()) {
-        $command = $this->getConfiguration('ParamCmd');
-		$eqLogic = $this->getEqLogic();
-		$eqLogic->executeCommand($command);
+        $ParamCmd = $this->getConfiguration('Ordre');
+      	$TypeAction = $this->getType();
+        $OrdreFamille=$this->getConfiguration('OrdreFamille');
+        if($TypeAction == 'action' )
+          {
+              $Action = 'SET';
+          }
+        elseif($TypeAction == 'info' )
+          {
+              $Action = 'GET';
+          }
+        else
+          {
+          return false;
+          }
+        $Param = $OrdreFamille.','.$ParamCmd;
+      	$eqLogic = $this->getEqLogic();
+      log::add('IntesisBoxWMP', 'debug', 'Launch ' . __FUNCTION__ .' / $ParamCmd = ' . $ParamCmd);
+		$eqLogic->CreateCommand($Param,$Action);
 		}
     
     /*     * **********************Getteur Setteur*************************** */

@@ -53,19 +53,17 @@ function addCmdToTable(_cmd) {
 			tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
         tr += '</td>';
         tr += '<td>';
-			tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="ParamCmd" placeholder="{{Commande}}" style="margin-bottom : 5px;width : 70%; display : inline-block;" />';
-        tr += '</td>';
-        tr += '<td>';
-			tr += '<select class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="updateCmdId" style="display:none;margin-top:5px;" title="Commande d\'information à mettre à jour">';
-			tr += '<option value="">Aucune</option>';
-			tr += '</select>';
-			tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> ';
+			tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="Ordre" placeholder="{{Commande}}" style="margin-bottom : 5px;width : 70%; display : inline-block;" />';
+			tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="OrdreFamille" placeholder="{{Categorie de Commande}}" style="margin-bottom : 5px;width : 70%; display : inline-block;" />';
         tr += '</td>';
         tr += '<td>';
 			if (is_numeric(_cmd.id)) {
 				tr += '<a class="btn btn-default btn-xs cmdAction" data-action="configure"><i class="fa fa-cogs"></i></a> ';
 				tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fa fa-rss"></i> {{Tester}}</a>';
+				tr += '</select>';
+			tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> ';
 			}
+			
 			tr += '<i class="fa fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i></td>';
         tr += '</tr>';
 
