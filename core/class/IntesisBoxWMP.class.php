@@ -17,7 +17,7 @@
  */
 
 /* * ***************************Includes********************************* */
-require_once __DIR__  . '/../../../../core/php/core.inc.php';
+require_once __DIR__ . '/../../../../core/php/core.inc.php';
 
 class IntesisBoxWMP extends eqLogic {
 	
@@ -66,91 +66,7 @@ class IntesisBoxWMP extends eqLogic {
     }
 
     public function postSave() {
-		$AcON = $this->getCmd(null, 'AcON');
-		if (!is_object($AcON)) {
-			$AcON = new IntesisBoxWMPCmd();
-			$AcON->setName(__('ON', __FILE__));
-			$AcON->setLogicalId('AcON');
-			$AcON->setIsVisible(1);
-			$AcON->setTemplate('dashboard', 'prise');
-		}
-		$AcON->setType('action');
-		$AcON->setSubType('other');
-		$AcON->setEqLogic_id($this->getId());
-		$AcON->setDisplay('generic_type', 'ENERGY_ON')
-		$AcON->setValue($power_state_id);
-		$AcON->save();
-		
-		$AcOFF = $this->getCmd(null, 'AcOFF');
-		if (!is_object($AcOFF)) {
-			$AcOFF = new IntesisBoxWMPCmd();
-			$AcOFF->setName(__('OFF', __FILE__));
-			$AcOFF->setLogicalId('AcOFF');
-			$AcOFF->setIsVisible(1);
-			$AcOFF->setTemplate('dashboard', 'prise');
-		}
-		$AcOFF->setType('action');
-		$AcOFF->setSubType('other');
-		$AcOFF->setEqLogic_id($this->getId());
-		$AcOFF->setDisplay('generic_type', 'ENERGY_OFF')
-		$AcOFF->setValue($power_state_id);
-		$AcOFF->save();
-		
-		if ($this->getConfiguration('IntesisBox_Type') != 'IS-IR-WMP-1') {
-			$AmbTemp = $this->getCmd(null, 'Ambient_Temp');
-				if (!is_object($AmbTemp)) {
-					$AmbTemp = new IntesisBoxWMPCmd();
-					$AmbTemp->setLogicalId('Ambient_Temp');
-					$AmbTemp->setIsVisible(1);
-					$AmbTemp->setName(__('Temperature Ambiante', __FILE__));
-				}
-				$AmbTemp->setType('info');
-				$AmbTemp->setSubType('string');
-				$AmbTemp->setEqLogic_id($this->getId());
-				$AmbTemp->setDisplay('generic_type', 'GENERIC');
-				$AmbTemp->save();
-		}
-		
-		if ($this->getConfiguration('IntesisBox_Type') != 'IS-IR-WMP-1') {
-			$ErrSt = $this->getCmd(null, 'Error_Status');
-				if (!is_object($ErrSt)) {
-					$ErrSt = new IntesisBoxWMPCmd();
-					$ErrSt->setLogicalId('Error_Status');
-					$ErrSt->setIsVisible(1);
-					$ErrSt->setName(__('Statut', __FILE__));
-				}
-				$ErrSt->setType('info');
-				$ErrSt->setSubType('string');
-				$ErrSt->setEqLogic_id($this->getId());
-				$ErrSt->setDisplay('generic_type', 'GENERIC');
-				$ErrSt->save();
-		}
-		
-		if ($this->getConfiguration('IntesisBox_Type') != 'IS-IR-WMP-1') {
-			$ErrCode = $this->getCmd(null, 'Error_Code');
-				if (!is_object($ErrCode)) {
-					$ErrCode = new IntesisBoxWMPCmd();
-					$ErrCode->setLogicalId('Error_Code');
-					$ErrCode->setIsVisible(1);
-					$ErrCode->setName(__('Code Erreur', __FILE__));
-				}
-				$ErrCode->setType('info');
-				$ErrCode->setSubType('string');
-				$ErrCode->setEqLogic_id($this->getId());
-				$ErrCode->setDisplay('generic_type', 'GENERIC');
-				$ErrCode->save();
-		}
-		
-		$refresh = $this->getCmd(null, 'refresh');
-		if (!is_object($refresh)) {
-			$refresh = new IntesisBoxWMPCmd();
-			$refresh->setName(__('Rafraichir', __FILE__));
-		}
-		$refresh->setEqLogic_id($this->getId());
-		$refresh->setLogicalId('refresh');
-		$refresh->setType('action');
-		$refresh->setSubType('other');
-		$refresh->save();
+				
     }
 
     public function preUpdate() {
@@ -194,6 +110,40 @@ class IntesisBoxWMP extends eqLogic {
     /*     * **********************Getteur Setteur*************************** */
 	
 	
+	public function CreateCommand ($Ordre = '',$OrdreType='') {
+		log::add('IntesisBoxWMP', 'debug', 'Construct ' . __FUNCTION__ .' / $Ordre = ' . $Ordre);
+		$AcNum = $this->getConfiguration('AcNum');
+      
+       	$command = $OrdreType.','.$AcNum.':'.$Ordre;
+		log::add('IntesisBoxWMP', 'debug', 'EndCreate ' . __FUNCTION__ .' / $command = ' . $command);
+		$this->executeCommand($command);
+		}
+		
+	public function executeCommand ($cmd = '') {
+		log::add('IntesisBoxWMP', 'debug', 'BEGIN ' . __FUNCTION__ .' / $cmd = ' . $cmd);
+		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+		
+		$ip = $this->getConfiguration('ip');
+		$PortCom = $this->getConfiguration('portCom');
+		$delay=500;
+		
+		if(socket_connect ($socket , $ip, $PortCom))
+		{
+			usleep($delay*1000);
+		
+			log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (IP : ' . $ip . ', PORT : ' . $PortCom . ')');
+			
+			log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (' . $cmd . ')');
+			socket_write ($socket ,$cmd . "\r\n");
+			
+			usleep(500000);
+			log::add('IntesisBoxWMP', 'debug', 'CLOSING CONNECTION');
+			socket_close($socket);
+			log::add('IntesisBoxWMP', 'debug', 'CLOSED');
+		}
+		return false;
+	}
+	
 }
 
 class IntesisBoxWMPCmd extends cmd {
@@ -211,71 +161,29 @@ class IntesisBoxWMPCmd extends cmd {
       return true;
       }
      */
-
+ 
     public function execute($_options = array()) {
-        $eqLogic = $this->getEqLogic();
-		$IP = $eqLogic->getConfiguration('ip');
-		$PortComm = $eqLogic->getConfiguration('PortComm')
-		$acNum = $eqLogic->getConfiguration('acNum')'';
-		$type = $this->getType();
-		$cmds = $this->getLogicalId();
-		switch ($this->getSubType()) {
-			case 'slider':
-				$cmds = trim(str_replace('#slider#', $_options['slider'], $cmds));
-				break;
-			case 'select':
-				$cmds = trim(str_replace('#listValue#', $_options['select'], $cmds));
-				break;
-			case 'message':
-				$cmds = trim(str_replace('#message#', $_options['message'], $cmds));
-				$cmds = trim(str_replace('#title#', $_options['title'], $cmds));
-				break;
+        $ParamCmd = $this->getConfiguration('Ordre');
+      	$TypeAction = $this->getType();
+        $OrdreFamille=$this->getConfiguration('OrdreFamille');
+        if($TypeAction == 'action' )
+          {
+              $Action = 'SET';
+          }
+        elseif($TypeAction == 'info' )
+          {
+              $Action = 'GET';
+          }
+        else
+          {
+          return false;
+          }
+        $Param = $OrdreFamille.','.$ParamCmd;
+      	$eqLogic = $this->getEqLogic();
+      log::add('IntesisBoxWMP', 'debug', 'Launch ' . __FUNCTION__ .' / $ParamCmd = ' . $ParamCmd);
+		$eqLogic->CreateCommand($Param,$Action);
 		}
-		$cmds = explode(',', $cmds);
-		$index=0;
-		$delay=0;
-		foreach ($cmds as $cmd) {
-			$cmd = trim($cmd);
-			$index++;
-			if ($type == 'action') {
-				if ($cmd == 'AcON') {
-					$command = 'SET'$acNum':ONOFF,ON';
-					$request_tcp=fsockopen($IP,$PortComm,,,):$command;
-					$this->$request_tcp;
-					$delay=2;
-					$This->fclose($request_tcp)
-				} else if ($cmd == 'off') {
-
-				} else if ($cmd == 'refresh' || $cmd == 'reachable') {
-					
-				} else {	// other commands
-					
-				}
-				if ( $index==count($cmds) ) {	// update on last cmd
-					sleep(1+$delay);
-					$eqLogic->updateInfo();
-				}
-			}
-			else {		// if 'info'
-				$eqLogic->updateInfo();
-			}
-		}
-    }
-
     /*     * **********************Getteur Setteur*************************** */
-	
-		function http_exec_wrapper($request_http, $timeout=2) {
-		try {
-			$request_http->exec($timeout);
-			return true;
-		} catch (Exception $e) {
-			if ($this->getConfiguration('canBeShutdown') == 1) {
-				return false;
-			} else {
-				throw new $e;
-			}
-		}
-	}
 }
 
 

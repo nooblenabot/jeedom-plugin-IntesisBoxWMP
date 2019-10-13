@@ -1,7 +1,7 @@
 {
 	"id" : "IntesisBoxWMP",
-	"name" : "IntesisBox Wifi",
-	"description" : "Plugin pour l'integration des interfaces Wifi WMP IntesisBox",
+	"name" : "IntesisBox",
+	"description" : "Plugin pour l'integration des interfaces IntesisBox",
 	"licence" : "AGPL",
 	"author" : "Nooblenabot",
 	"require" : "3.2",
@@ -9,8 +9,9 @@
 	"hasDependency" : false,
 	"hasOwnDeamon" : false,
 	"maxDependancyInstallTime" : 0,
-	"changelog" : "https://jeedom.github.io/plugin-template/#language#/changelog",
-	"documentation" : "https://github.com/nooblenabot/jeedom-plugin-IntesisBoxWMP/wiki",
+	"pluginVersion" : "0.1a",
+	"changelog" : "https://github.com/nooblenabot/jeedom-plugin-IntesisBoxWMP/wiki",
+	"documentation" : "https://jeedom.github.io/plugin-template/#language#/",
 	"link" : {
 		"forum":"Lien vers le forum"
 	},
