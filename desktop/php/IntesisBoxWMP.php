@@ -159,8 +159,6 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
     </div>
   </fieldset>
 </form>
-<!--<div class="alert alert-info">{{Si vous venez de créer votre clé api il faut peut être patienter quelques heures avant qu'elle soit active (en attendant il peut y avoir une erreur d'authentification)}} </div>
--->
 </div>
 <div role="tabpanel" class="tab-pane" id="commandtab">
   <a class="btn btn-success btn-sm cmdAction pull-right" id="bt_addIntesisCMD" style="margin-top:5px;"><i class="fa fa-plus-circle"></i> {{Ajouter une commande}}</a><br/><br/>

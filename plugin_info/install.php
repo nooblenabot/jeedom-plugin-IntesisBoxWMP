@@ -19,6 +19,7 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 function IntesisBoxWMP_install() {
+
 	/*
     $cron = cron::byClassAndFunction('IntesisBoxWMP', 'check');
 	if (!is_object($cron)) {
@@ -51,16 +52,19 @@ function IntesisBoxWMP_update() {
 		$IntesisBoxWMP->save();
 	}
 	*/
+
 }
 
 
 function IntesisBoxWMP_remove() {
+
     /*
 	$cron = cron::byClassAndFunction('IntesisBoxWMP', 'check');
 	if (is_object($cron)) {
 		$cron->remove();
 	}
 	*/
+
 }
 
 ?>

@@ -32,6 +32,10 @@ class IntesisBoxWMP extends eqLogic {
      */
 
 
+     /* Fonction exécutée automatiquement toutes les 15 minutes par Jeedom */
+      public static function cron15() {
+      }
+
     /*
      * Fonction exécutée automatiquement toutes les heures par Jeedom
       public static function cronHourly() {
@@ -179,7 +183,6 @@ class IntesisBoxWMPCmd extends cmd {
       log::add('IntesisBoxWMP', 'debug', 'Launch ' . __FUNCTION__ .' / $ParamCmd = ' . $ParamCmd);
 		$eqLogic->CreateCommand($Param,$Action);
 		}
-    
     /*     * **********************Getteur Setteur*************************** */
 }
 
