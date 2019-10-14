@@ -54,7 +54,10 @@ function addCmdToTable(_cmd) {
         tr += '</td>';
         tr += '<td>';
 			tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="Ordre" placeholder="{{Commande}}" style="margin-bottom : 5px;width : 70%; display : inline-block;" />';
+			if(!isset(_cmd.type) || _cmd.type == 'action' )
+			{
 			tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="OrdreFamille" placeholder="{{Categorie de Commande}}" style="margin-bottom : 5px;width : 70%; display : inline-block;" />';
+			}
         tr += '</td>';
         tr += '<td>';
 			if (is_numeric(_cmd.id)) {

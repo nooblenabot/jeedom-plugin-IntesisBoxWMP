@@ -56,6 +56,11 @@ foreach ($eqLogics as $eqLogic) {
  </div>
 </div>
 
+<div class="col-lg-10 col-md-9 col-sm-8 eqLogic" style="border-left: solid 1px #EEE; padding-left: 25px;display: none;">
+ <a class="btn btn-default eqLogicAction pull-right" data-action="configure"><i class="fa fa-cogs"></i> {{Configuration avancée}}</a>
+ <a class="btn btn-success eqLogicAction pull-right" data-action="save"><i class="fa fa-check-circle"></i> {{Sauvegarder}}</a>
+ <a class="btn btn-danger eqLogicAction pull-right" data-action="remove"><i class="fa fa-minus-circle"></i> {{Supprimer}}</a>
+ <!--
 <div class="col-xs-12 eqLogic" style="border-left: solid 1px #EEE; padding-left: 25px;display: none;">
 	<div class="input-group pull-right" style="display:inline-flex">
 			<span class="input-group-btn">
@@ -64,6 +69,7 @@ foreach ($eqLogics as $eqLogic) {
 				 <a class="btn btn-danger eqLogicAction pull-right" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}</a>
 			 </span>
 	</div>
+	-->
 <ul class="nav nav-tabs" role="tablist">
    <li role="presentation"><a class="eqLogicAction cursor" aria-controls="home" role="tab" data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
    <li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Equipement}}</a></li>
@@ -141,13 +147,13 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
 	<div class="form-group">
 		<label class="col-sm-3 control-label">{{Port Communication}}</label>
 		<div class="col-sm-3">
-			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="portCom" Value="3310"/>
+			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="portCom" Value="3310" placeholder="3310"/>
 		</div>
 	</div>
 	<div class="form-group">
 		<label class="col-sm-3 control-label">{{Identifiant Climatiseur}}</label>
 		<div class="col-sm-3">
-			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="AcNum" Value="1"/>
+			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="AcNum" Value="1" placeholder="1"/>
 		</div>
 	</div>
 	<div class="form-group">

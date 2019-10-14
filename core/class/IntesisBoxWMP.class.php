@@ -33,7 +33,7 @@ class IntesisBoxWMP extends eqLogic {
 
 
      /* Fonction exécutée automatiquement toutes les 15 minutes par Jeedom */
-      public static function cron15() {
+     /* public static function cron15() {
       }
 
     /*
@@ -53,8 +53,8 @@ class IntesisBoxWMP extends eqLogic {
     /*     * *********************Méthodes d'instance************************* */
 
     public function preInsert() {
-		$this->setCategory('wellness', 1);
-        
+		/*$this->setCategory('wellness', 1);
+        */
     }
 
     public function postInsert() {
@@ -70,13 +70,308 @@ class IntesisBoxWMP extends eqLogic {
     }
 
     public function preUpdate() {
-        		if ($this->getConfiguration('ip') == '') {
+		
+        if ($this->getConfiguration('ip') == '') {
 			throw new Exception(__('Le champs IP ne peut etre vide', __FILE__));
 		}
-
+		/*    
+		$This->setConfiguration('portCom','3310');
+		$This->setConfiguration('AcNum','1');
+		*/
     }
 
     public function postUpdate() {
+		
+	/* Power on / off Status */
+	
+		$cmd = $this->getCmd(null,'ONOFF.ON');
+            if (!is_object($cmd)) {
+                $cmd = new IntesisBoxWMPCmd();
+                $cmd->setLogicalId('ONOFF.ON');
+                $cmd->setIsVisible(1);
+                $cmd->setName(__('On', __FILE__));
+            }
+            $cmd->setType('action');
+            $cmd->setSubType('other');
+            $cmd->setConfiguration('OrdreFamille','ONOFF');
+            $cmd->setConfiguration('Ordre','ON');
+          //  $cmd->setValue('Etat');
+            $cmd->setEqLogic_id($this->getId());
+            $cmd->save();
+      
+      	$cmd = $this->getCmd(null,'ONOFF.OFF');
+        if (!is_object($cmd)) {
+            $cmd = new IntesisBoxWMPCmd();
+            $cmd->setLogicalId('ONOFF.OFF');
+            $cmd->setIsVisible(1);
+            $cmd->setName(__('Off', __FILE__));
+        }
+        $cmd->setType('action');
+        $cmd->setSubType('other');
+        $cmd->setConfiguration('OrdreFamille','ONOFF');
+		$cmd->setConfiguration('Ordre','OFF');
+		//$cmd->setValue('Etat');
+        $cmd->setEqLogic_id($this->getId());
+        $cmd->save();
+		
+      /*
+		$cmd = $this->getCmd(null,'ONOFF');
+        if (!is_object($cmd)) {
+            $cmd = new IntesisBoxWMPCmd();
+            $cmd->setLogicalId('ONOFF');
+            $cmd->setIsVisible(1);
+            $cmd->setName(__('Etat', __FILE__));
+        }
+        $cmd->setType('info');
+        $cmd->setSubType('binary');
+		$cmd->setDisplay('generic_type','GENERIC_INFO');
+        $cmd->setConfiguration('OrdreFamille','ONOFF');
+		$cmd->setEqLogic_id($this->getId());
+        $cmd->save();
+      */
+	 /* Mode Status */
+	 
+		$cmd = $this->getCmd(null,'MODE.AUTO');
+		if (!is_object($cmd)) {
+			$cmd = new IntesisBoxWMPCmd();
+			$cmd->setLogicalId('MODE.AUTO');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('Mode Auto', __FILE__));
+		}
+		$cmd->setType('action');
+		$cmd->setSubType('other');
+		$cmd->setConfiguration('OrdreFamille','MODE');
+		$cmd->setConfiguration('Ordre','AUTO');
+	  //  $cmd->setValue('Mode');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+      
+      	$cmd = $this->getCmd(null,'MODE.HEAT');
+        if (!is_object($cmd)) {
+            $cmd = new IntesisBoxWMPCmd();
+            $cmd->setLogicalId('MODE.HEAT');
+            $cmd->setIsVisible(1);
+            $cmd->setName(__('Chaud', __FILE__));
+        }
+        $cmd->setType('action');
+        $cmd->setSubType('other');
+        $cmd->setConfiguration('OrdreFamille','MODE');
+		$cmd->setConfiguration('Ordre','HEAT');
+		//$cmd->setValue('Mode');
+        $cmd->setEqLogic_id($this->getId());
+        $cmd->save();
+		
+		$cmd = $this->getCmd(null,'MODE.DRY');
+		if (!is_object($cmd)) {
+			$cmd = new IntesisBoxWMPCmd();
+			$cmd->setLogicalId('MODE.DRY');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('Deshum', __FILE__));
+		}
+		$cmd->setType('action');
+		$cmd->setSubType('other');
+		$cmd->setConfiguration('OrdreFamille','MODE');
+		$cmd->setConfiguration('Ordre','DRY');
+	  //  $cmd->setValue('Mode');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+      
+      	$cmd = $this->getCmd(null,'MODE.FAN');
+        if (!is_object($cmd)) {
+            $cmd = new IntesisBoxWMPCmd();
+            $cmd->setLogicalId('MODE.FAN');
+            $cmd->setIsVisible(1);
+            $cmd->setName(__('Ventil', __FILE__));
+        }
+        $cmd->setType('action');
+        $cmd->setSubType('other');
+        $cmd->setConfiguration('OrdreFamille','MODE');
+		$cmd->setConfiguration('Ordre','FAN');
+		//$cmd->setValue('Mode');
+        $cmd->setEqLogic_id($this->getId());
+        $cmd->save();
+		
+		$cmd = $this->getCmd(null,'MODE.COOL');
+        if (!is_object($cmd)) {
+            $cmd = new IntesisBoxWMPCmd();
+            $cmd->setLogicalId('MODE.COOL');
+            $cmd->setIsVisible(1);
+            $cmd->setName(__('Froid', __FILE__));
+        }
+        $cmd->setType('action');
+        $cmd->setSubType('other');
+        $cmd->setConfiguration('OrdreFamille','MODE');
+		$cmd->setConfiguration('Ordre','COOL');
+		//$cmd->setValue('Mode');
+        $cmd->setEqLogic_id($this->getId());
+        $cmd->save();
+      /*
+		$cmd = $this->getCmd(null,'MODE');
+        if (!is_object($cmd)) {
+            $cmd = new IntesisBoxWMPCmd();
+            $cmd->setLogicalId('MODE');
+            $cmd->setIsVisible(1);
+            $cmd->setName(__('Etat', __FILE__));
+        }
+        $cmd->setType('info');
+        $cmd->setSubType('numeric');
+		$cmd->setDisplay('generic_type','GENERIC_INFO');
+        $cmd->setConfiguration('OrdreFamille','MODE');
+		$cmd->setEqLogic_id($this->getId());
+        $cmd->save();
+      */
+	  
+	  /* Ventilation Status */
+	  
+		$cmd = $this->getCmd(null,'FANSP.AUTO');
+        if (!is_object($cmd)) {
+            $cmd = new IntesisBoxWMPCmd();
+            $cmd->setLogicalId('FANSP.AUTO');
+            $cmd->setIsVisible(1);
+            $cmd->setName(__('Fan Auto', __FILE__));
+        }
+        $cmd->setType('action');
+        $cmd->setSubType('other');
+        $cmd->setConfiguration('OrdreFamille','FANSP');
+		$cmd->setConfiguration('Ordre','AUTO');
+		//$cmd->setValue('Mode');
+        $cmd->setEqLogic_id($this->getId());
+        $cmd->save();
+	  
+		$cmd = $this->getCmd(null,'FANSP.1');
+        if (!is_object($cmd)) {
+            $cmd = new IntesisBoxWMPCmd();
+            $cmd->setLogicalId('FANSP.1');
+            $cmd->setIsVisible(1);
+            $cmd->setName(__('Fan Silent', __FILE__));
+        }
+        $cmd->setType('action');
+        $cmd->setSubType('other');
+        $cmd->setConfiguration('OrdreFamille','FANSP');
+		$cmd->setConfiguration('Ordre','1');
+		//$cmd->setValue('Mode');
+        $cmd->setEqLogic_id($this->getId());
+        $cmd->save();
+		
+		$cmd = $this->getCmd(null,'FANSP.2');
+		if (!is_object($cmd)) {
+			$cmd = new IntesisBoxWMPCmd();
+			$cmd->setLogicalId('FANSP.2');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('Fan 1', __FILE__));
+		}
+		$cmd->setType('action');
+		$cmd->setSubType('other');
+		$cmd->setConfiguration('OrdreFamille','FANSP');
+		$cmd->setConfiguration('Ordre','2');
+	  //  $cmd->setValue('Mode');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+      
+      	$cmd = $this->getCmd(null,'FANSP.3');
+        if (!is_object($cmd)) {
+            $cmd = new IntesisBoxWMPCmd();
+            $cmd->setLogicalId('FANSP.3');
+            $cmd->setIsVisible(1);
+            $cmd->setName(__('Fan 2', __FILE__));
+        }
+        $cmd->setType('action');
+        $cmd->setSubType('other');
+        $cmd->setConfiguration('OrdreFamille','FANSP');
+		$cmd->setConfiguration('Ordre','3');
+		//$cmd->setValue('Mode');
+        $cmd->setEqLogic_id($this->getId());
+        $cmd->save();
+		
+		$cmd = $this->getCmd(null,'FANSP.4');
+        if (!is_object($cmd)) {
+            $cmd = new IntesisBoxWMPCmd();
+            $cmd->setLogicalId('FANSP.4');
+            $cmd->setIsVisible(1);
+            $cmd->setName(__('Fan 3', __FILE__));
+        }
+        $cmd->setType('action');
+        $cmd->setSubType('other');
+        $cmd->setConfiguration('OrdreFamille','FANSP');
+		$cmd->setConfiguration('Ordre','4');
+		//$cmd->setValue('Mode');
+        $cmd->setEqLogic_id($this->getId());
+        $cmd->save();
+      /*
+		$cmd = $this->getCmd(null,'FANSP');
+        if (!is_object($cmd)) {
+            $cmd = new IntesisBoxWMPCmd();
+            $cmd->setLogicalId('FANSP');
+            $cmd->setIsVisible(1);
+            $cmd->setName(__('Etat', __FILE__));
+        }
+        $cmd->setType('info');
+        $cmd->setSubType('numeric');
+		$cmd->setDisplay('generic_type','GENERIC_INFO');
+        $cmd->setConfiguration('OrdreFamille','FANSP');
+		$cmd->setEqLogic_id($this->getId());
+        $cmd->save();
+      */
+	  
+	  
+	  
+      /*
+		if !(strpos($this->getConfiguration('IntesisBox_Type'),'IS-IR-WMP-1')) {
+            $cmd = $this->getCmd(null,'AMBTEMP');
+			if (!is_object($cmd)) {
+				$cmd = new IntesisBoxWMPCmd();
+				$cmd->setLogicalId('AMBTEMP');
+				$cmd->setIsVisible(1);
+				$cmd->setName(__('Temperature', __FILE__));
+			}
+			$cmd->setType('info');
+			$cmd->setSubType('numeric');
+			$cmd->setDisplay('generic_type','TEMPERATURE');
+			$cmd->setConfiguration('OrdreFamille','AMBTEMP');
+			$cmd->setUnite('°C');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->save();
+		}
+      */
+		/*
+		 if (strpos($this->getConfiguration('VANEUD'),'1')) {
+            $cmd = $this->getCmd(null,'VANEUD');
+			if (!is_object($cmd)) {
+				$cmd = new IntesisBoxWMPCmd();
+				$cmd->setLogicalId('VANEUD');
+				$cmd->setIsVisible(1);
+				$cmd->setName(__('Volet UP', __FILE__));
+			}
+			$cmd->setType('info');
+			$cmd->setSubType('numeric');
+			$cmd->setDisplay('generic_type','TEMPERATURE');
+			$cmd->setConfiguration('OrdreFamille','AMBTEMP');
+			$cmd->setUnite('°C');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->save();
+		}
+        */
+/*
+
+< [Tx]  LIMITS:*
+> [rx]  LIMITS:ONOFF,[OFF,ON]
+< [Tx]  CFG:*
+< [Tx]  GET,1:*
+> [rx]  LIMITS:MODE,[AUTO,HEAT,DRY,FAN,COOL]
+> [rx]  LIMITS:FANSP,[AUTO,1,2,3,4]
+> [rx]  LIMITS:VANEUD,[AUTO,SWING,PULSE]
+> [rx]  LIMITS:VANELR,[]
+> [rx]  LIMITS:SETPTEMP,[160,300]
+> [rx]  CHN,1:ONOFF,OFF
+> [rx]  CHN,1:MODE,HEAT
+> [rx]  CHN,1:FANSP,1
+> [rx]  CHN,1:VANEUD,AUTO
+> [rx]  CHN,1:VANELR,AUTO
+> [rx]  CHN,1:SETPTEMP,210
+> [rx]  CHN,1:AMBTEMP,285
+> [rx]  CHN,1:ERRSTATUS,OK
+> [rx]  CHN,1:ERRCODE,0
+*/
         
     }
 
