@@ -28,6 +28,8 @@ class IntesisBoxWMP extends eqLogic {
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom
       public static function cron() {
+		  
+		  
       }
      */
 
@@ -84,20 +86,43 @@ class IntesisBoxWMP extends eqLogic {
 		
 	/* Power on / off Status */
 	
+	 	$cmd = $this->getCmd(null,'ONOFF');
+        if (!is_object($cmd)) {
+			log::add('IntesisBoxWMP', 'debug', 'Command n\'existe pas , creation (' . $cmd . ')');
+            $cmd = new IntesisBoxWMPCmd();
+            $cmd->setLogicalId('ONOFF');
+            $cmd->setIsVisible(1);
+            $cmd->setName(__('Etat', __FILE__));
+        }
+		
+        $cmd->setType('info');
+        $cmd->setSubType('binary');
+		$cmd->setDisplay('generic_type','GENERIC_INFO');
+        $cmd->setConfiguration('OrdreFamille','ONOFF');
+		$cmd->setEqLogic_id($this->getId());
+        $cmd->save();
+		$EtatStatusId='';
+		$state_id = $cmd->getId();
+		if ($cmd ->getLogicalId()=='ONOFF') $EtatStatusId = $state_id;
+		$cmd->save();
+    	
 		$cmd = $this->getCmd(null,'ONOFF.ON');
-            if (!is_object($cmd)) {
-                $cmd = new IntesisBoxWMPCmd();
-                $cmd->setLogicalId('ONOFF.ON');
-                $cmd->setIsVisible(1);
-                $cmd->setName(__('On', __FILE__));
-            }
-            $cmd->setType('action');
-            $cmd->setSubType('other');
-            $cmd->setConfiguration('OrdreFamille','ONOFF');
-            $cmd->setConfiguration('Ordre','ON');
-          //  $cmd->setValue('Etat');
-            $cmd->setEqLogic_id($this->getId());
-            $cmd->save();
+		if (!is_object($cmd)) {
+			$cmd = new IntesisBoxWMPCmd();
+			$cmd->setLogicalId('ONOFF.ON');
+			$cmd->setIsVisible(1);
+			$cmd->setName(__('On', __FILE__));
+		}
+		$cmd->setType('action');
+		$cmd->setSubType('other');
+		$cmd->setConfiguration('OrdreFamille','ONOFF');
+		$cmd->setConfiguration('Ordre','ON');
+		$cmd->setValue('ONOFF');
+		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+		if($cmd->getValue()=='ONOFF') $cmd->setValue($EtatStatusId);
+		$cmd->save();
+		
       
       	$cmd = $this->getCmd(null,'ONOFF.OFF');
         if (!is_object($cmd)) {
@@ -110,26 +135,31 @@ class IntesisBoxWMP extends eqLogic {
         $cmd->setSubType('other');
         $cmd->setConfiguration('OrdreFamille','ONOFF');
 		$cmd->setConfiguration('Ordre','OFF');
-		//$cmd->setValue('Etat');
+		$cmd->setValue('ONOFF');
         $cmd->setEqLogic_id($this->getId());
         $cmd->save();
+		if($cmd->getValue()=='ONOFF') $cmd->setValue($EtatStatusId);
+		$cmd->save();
 		
-      /*
-		$cmd = $this->getCmd(null,'ONOFF');
+	 /* Mode Status */
+	 
+		$cmd = $this->getCmd(null,'MODE');
         if (!is_object($cmd)) {
             $cmd = new IntesisBoxWMPCmd();
-            $cmd->setLogicalId('ONOFF');
+            $cmd->setLogicalId('MODE');
             $cmd->setIsVisible(1);
-            $cmd->setName(__('Etat', __FILE__));
+            $cmd->setName(__('Mode', __FILE__));
         }
         $cmd->setType('info');
-        $cmd->setSubType('binary');
+        $cmd->setSubType('string');
 		$cmd->setDisplay('generic_type','GENERIC_INFO');
-        $cmd->setConfiguration('OrdreFamille','ONOFF');
+        $cmd->setConfiguration('OrdreFamille','MODE');
 		$cmd->setEqLogic_id($this->getId());
         $cmd->save();
-      */
-	 /* Mode Status */
+		$EtatModeId='';
+		$state_id = $cmd->getId();
+		if ($cmd ->getLogicalId()=='MODE') $EtatModeId = $state_id;
+		$cmd->save();
 	 
 		$cmd = $this->getCmd(null,'MODE.AUTO');
 		if (!is_object($cmd)) {
@@ -142,8 +172,10 @@ class IntesisBoxWMP extends eqLogic {
 		$cmd->setSubType('other');
 		$cmd->setConfiguration('OrdreFamille','MODE');
 		$cmd->setConfiguration('Ordre','AUTO');
-	  //  $cmd->setValue('Mode');
+	  $cmd->setValue('MODE');
 		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+		            if($cmd->getValue()=='MODE') $cmd->setValue($EtatModeId);
 		$cmd->save();
       
       	$cmd = $this->getCmd(null,'MODE.HEAT');
@@ -157,9 +189,11 @@ class IntesisBoxWMP extends eqLogic {
         $cmd->setSubType('other');
         $cmd->setConfiguration('OrdreFamille','MODE');
 		$cmd->setConfiguration('Ordre','HEAT');
-		//$cmd->setValue('Mode');
+		$cmd->setValue('MODE');
         $cmd->setEqLogic_id($this->getId());
         $cmd->save();
+		            if($cmd->getValue()=='MODE') $cmd->setValue($EtatModeId);
+		$cmd->save();
 		
 		$cmd = $this->getCmd(null,'MODE.DRY');
 		if (!is_object($cmd)) {
@@ -172,8 +206,10 @@ class IntesisBoxWMP extends eqLogic {
 		$cmd->setSubType('other');
 		$cmd->setConfiguration('OrdreFamille','MODE');
 		$cmd->setConfiguration('Ordre','DRY');
-	  //  $cmd->setValue('Mode');
+	 $cmd->setValue('MODE');
 		$cmd->setEqLogic_id($this->getId());
+		$cmd->save();
+		            if($cmd->getValue()=='MODE') $cmd->setValue($EtatModeId);
 		$cmd->save();
       
       	$cmd = $this->getCmd(null,'MODE.FAN');
@@ -187,9 +223,11 @@ class IntesisBoxWMP extends eqLogic {
         $cmd->setSubType('other');
         $cmd->setConfiguration('OrdreFamille','MODE');
 		$cmd->setConfiguration('Ordre','FAN');
-		//$cmd->setValue('Mode');
+		$cmd->setValue('MODE');
         $cmd->setEqLogic_id($this->getId());
         $cmd->save();
+		            if($cmd->getValue()=='MODE') $cmd->setValue($EtatModeId);
+		$cmd->save();
 		
 		$cmd = $this->getCmd(null,'MODE.COOL');
         if (!is_object($cmd)) {
@@ -202,25 +240,12 @@ class IntesisBoxWMP extends eqLogic {
         $cmd->setSubType('other');
         $cmd->setConfiguration('OrdreFamille','MODE');
 		$cmd->setConfiguration('Ordre','COOL');
-		//$cmd->setValue('Mode');
+		$cmd->setValue('MODE');
         $cmd->setEqLogic_id($this->getId());
         $cmd->save();
-      /*
-		$cmd = $this->getCmd(null,'MODE');
-        if (!is_object($cmd)) {
-            $cmd = new IntesisBoxWMPCmd();
-            $cmd->setLogicalId('MODE');
-            $cmd->setIsVisible(1);
-            $cmd->setName(__('Etat', __FILE__));
-        }
-        $cmd->setType('info');
-        $cmd->setSubType('numeric');
-		$cmd->setDisplay('generic_type','GENERIC_INFO');
-        $cmd->setConfiguration('OrdreFamille','MODE');
-		$cmd->setEqLogic_id($this->getId());
-        $cmd->save();
-      */
-	  
+		            if($cmd->getValue()=='MODE') $cmd->setValue($EtatModeId);
+		$cmd->save();
+     	  
 	  /* Ventilation Status */
 	  
 		$cmd = $this->getCmd(null,'FANSP.AUTO');
@@ -372,6 +397,8 @@ class IntesisBoxWMP extends eqLogic {
 > [rx]  CHN,1:ERRSTATUS,OK
 > [rx]  CHN,1:ERRCODE,0
 */
+
+		
         
     }
 
@@ -437,6 +464,11 @@ class IntesisBoxWMP extends eqLogic {
 			log::add('IntesisBoxWMP', 'debug', 'CLOSED');
 		}
 		return false;
+	}
+	
+	public function returnCommand ()
+	{
+		
 	}
 	
 }
