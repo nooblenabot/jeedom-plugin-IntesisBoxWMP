@@ -281,7 +281,7 @@ class IntesisBoxWMP extends eqLogic {
         $cmd->setType('action');
         $cmd->setSubType('slider');
         $cmd->setConfiguration('OrdreFamille','SETPTEMP');
-		$cmd->setConfiguration('Ordre',$value);
+		$cmd->setConfiguration('Ordre','');
 		$cmd->setDisplay('generic_type','THERMOSTAT_SET_SETPOINT');
 		$cmd->setValue('SETPTEMP');
 		$cmd->setConfiguration('minValue', 16);
@@ -423,6 +423,7 @@ class IntesisBoxWMP extends eqLogic {
 		$cmd->setConfiguration('Ordre','4');
 		$cmd->setValue('VANEUD');
         $cmd->setEqLogic_id($this->getId());
+		//$cmd->setConfiguration('listValue','5|Arrêt;6|Hors-Gel;4|Eco;8|Confort -2;7|Confort -1;3|Confort');
         $cmd->save();
 		if($cmd->getValue()=='VANEUD') $cmd->setValue($Vane);
 		$cmd->save();
@@ -503,11 +504,40 @@ class IntesisBoxWMP extends eqLogic {
     /*     * **********************Getteur Setteur*************************** */
 	
 	
-	public function CreateCommand ($Ordre = '',$OrdreType='') {
+	public function CreateCommand ($ParamCmd = '',$OrdreType='',$ParamFamille='') {
+		/* Constantes */
 		log::add('IntesisBoxWMP', 'debug', 'Construct ' . __FUNCTION__ .' / $Ordre = ' . $Ordre);
 		$AcNum = $this->getConfiguration('AcNum');
-      
-       	$command = $OrdreType.','.$AcNum.':'.$Ordre;
+		
+/* recuperation temperature consigne + passage en non decimal */
+		if ($ParamFamille == 'SETPTEMP' and $OrdreType== 'action'){
+          log::add('IntesisBoxWMP', 'debug', 'coucou');
+         /* $cmd = $this->getCmd(null,'FANSP.4');
+          if ($cmd ->getLogicalId()=='VANEUD') $Vane = $state_id;
+   			$encTemp = getLogicalId()==;
+          log::add('IntesisBoxWMP', 'debug', 'Temp ' . $encTemp);
+			$encTemp->setConfiguration('Ordre',$STtemp);
+          */
+           $ParamCmd = $ParamCmd *10;
+		}
+		
+		/* action ou info ? */
+		if($OrdreType == 'action' )
+          {
+              $Action = 'SET';
+			  $Ordre = $ParamFamille.','.$ParamCmd;
+          }
+        elseif($OrdreType == 'info' )
+          {
+              $Action = 'GET';
+			  $Ordre = $ParamFamille;
+          }
+        else
+          {
+          return false;
+          }
+        
+        $command = $Action.','.$AcNum.':'.$Ordre;
 		log::add('IntesisBoxWMP', 'debug', 'EndCreate ' . __FUNCTION__ .' / $command = ' . $command);
 		$this->executeCommand($command);
 		}
@@ -533,6 +563,7 @@ class IntesisBoxWMP extends eqLogic {
 			log::add('IntesisBoxWMP', 'debug', 'CLOSING CONNECTION');
 			socket_close($socket);
 			log::add('IntesisBoxWMP', 'debug', 'CLOSED');
+			
 		}
 		return false;
 	}
@@ -561,25 +592,19 @@ class IntesisBoxWMPCmd extends cmd {
      */
  
     public function execute($_options = array()) {
-        $ParamCmd = $this->getConfiguration('Ordre');
-      	$TypeAction = $this->getType();
+		$_action = $this->getLogicalId();
+/* surcharge pour consigne temperature */
+		if ($_action == 'SETPTEMP.Act') {
+                $STtemp = $_options['slider'];
+				$this->setConfiguration('Ordre',$STtemp);
+		}
+		
+        $Param = $this->getConfiguration('Ordre');
+      	$Action = $this->getType();
         $OrdreFamille=$this->getConfiguration('OrdreFamille');
-        if($TypeAction == 'action' )
-          {
-              $Action = 'SET';
-          }
-        elseif($TypeAction == 'info' )
-          {
-              $Action = 'GET';
-          }
-        else
-          {
-          return false;
-          }
-        $Param = $OrdreFamille.','.$ParamCmd;
-      	$eqLogic = $this->getEqLogic();
-      log::add('IntesisBoxWMP', 'debug', 'Launch ' . __FUNCTION__ .' / $ParamCmd = ' . $ParamCmd);
-		$eqLogic->CreateCommand($Param,$Action);
+        $eqLogic = $this->getEqLogic();
+      log::add('IntesisBoxWMP', 'debug', 'Launch ' . __FUNCTION__ .' / $Param = ' . $Param.'+'.$Action.'+'.$OrdreFamille);
+		$eqLogic->CreateCommand($Param,$Action,$OrdreFamille);
 		}
     /*     * **********************Getteur Setteur*************************** */
 }
