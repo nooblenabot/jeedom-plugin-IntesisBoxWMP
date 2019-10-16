@@ -581,11 +581,17 @@ class IntesisBoxWMP extends eqLogic {
 			
 			log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (' . $cmd . ')');
 			socket_write ($socket ,$cmd . "\r\n");
-			$repack = socket_read($socket, 5);
-			log::add('IntesisBoxWMP', 'debug', 'Return reponse au ack (' . $repack . ')');
-          	usleep($delay*1000);
-			$reponse = socket_read($socket, 4096, PHP_NORMAL_READ);
-			log::add('IntesisBoxWMP', 'debug', 'Return reponse (' . $reponse . ')');
+			log::add('IntesisBoxWMP', 'debug', 'Commande ecrite');
+			          $buff = '';
+          //$bytes = socket_recv($socket, $buff, 174, MSG_PEEK/MSG_DONTWAIT);
+         $bytes = socket_recvmsg($socket, $buff);
+          log::add('IntesisBoxWMP', 'debug', 'Octets reponse (' . $bytes . ')');
+          log::add('IntesisBoxWMP', 'debug', 'Return reponse (' . $buff . ')');
+         // $bytes2 = socket_recv($socket, $buff2, 174, MSG_TRUNC/MSG_PEEK/MSG_DONTWAIT);
+          //          log::add('IntesisBoxWMP', 'debug', 'Octets reponse2 (' . $bytes2 . ')');
+          //log::add('IntesisBoxWMP', 'debug', 'Return reponse2 (' . $buff2 . ')');
+			log::add('IntesisBoxWMP', 'debug', 'Octets reponse (' . $bytes . ')');
+       	    log::add('IntesisBoxWMP', 'debug', 'Return reponse (' . $buff . ')');
 			usleep($delay*1000);
 			log::add('IntesisBoxWMP', 'debug', 'CLOSING CONNECTION');
 			socket_close($socket);
