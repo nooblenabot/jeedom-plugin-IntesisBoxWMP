@@ -52,6 +52,7 @@ class IntesisBoxWMP extends eqLogic {
 
 
 
+
     /*     * *********************Méthodes d'instance************************* */
 
     public function preInsert() {
@@ -83,6 +84,23 @@ class IntesisBoxWMP extends eqLogic {
 	}
 
     public function postUpdate() {
+		
+		/* Do Nothing
+		$cmd = $this->getCmd(null, 'RefreshAction');
+        if (!is_object($cmd)) {
+            $cmd = new IntesisBoxWMPCmd();
+        }
+        $cmd->setName(__('RefreshAction', __FILE__));
+        $cmd->setEqLogic_id($this->id);
+		$cmd->setLogicalId('RefreshAction');
+        $cmd->setType('action');
+        $cmd->setSubType('other');
+       	$cmd->setIsVisible(1);
+ 				$cmd->setDisplay('icon', '<i class="fa fa-refresh"></i>');
+ 				$cmd->setDisplay('showOndashboard', 1);
+ 				$cmd->setDisplay('showNameOndashboard', 0);
+        $cmd->save();
+		*/
 		
 	/* Power on / off Status */
 	
@@ -118,6 +136,7 @@ class IntesisBoxWMP extends eqLogic {
 		$cmd->setConfiguration('OrdreFamille','ONOFF');
 		$cmd->setConfiguration('Ordre','ON');
 		$cmd->setValue('ONOFF');
+		$cmd->setTemplate('dashboard','circle');
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
 		if($cmd->getValue()=='ONOFF') $cmd->setValue($EtatStatusId);
@@ -136,13 +155,14 @@ class IntesisBoxWMP extends eqLogic {
         $cmd->setConfiguration('OrdreFamille','ONOFF');
 		$cmd->setConfiguration('Ordre','OFF');
 		$cmd->setValue('ONOFF');
+		$cmd->setTemplate('dashboard','circle');
         $cmd->setEqLogic_id($this->getId());
         $cmd->save();
 		if($cmd->getValue()=='ONOFF') $cmd->setValue($EtatStatusId);
 		$cmd->save();
 		
 	 /* Mode Status */
-	 
+	 /*
 		$cmd = $this->getCmd(null,'MODE');
         if (!is_object($cmd)) {
             $cmd = new IntesisBoxWMPCmd();
@@ -246,7 +266,7 @@ class IntesisBoxWMP extends eqLogic {
         $cmd->save();
 		if($cmd->getValue()=='MODE') $cmd->setValue($EtatModeId);
 		$cmd->save();
-		
+		*/
 	/* Temperature de consigne */	
 		
 		
@@ -500,18 +520,21 @@ class IntesisBoxWMP extends eqLogic {
     public static function preConfig_<Variable>() {
     }
      */
-
+	 
     /*     * **********************Getteur Setteur*************************** */
+	
+	
 	
 	
 	public function CreateCommand ($ParamCmd = '',$OrdreType='',$ParamFamille='') {
 		/* Constantes */
-		log::add('IntesisBoxWMP', 'debug', 'Construct ' . __FUNCTION__ .' / $Ordre = ' . $Ordre);
+		log::add('IntesisBoxWMP', 'debug', 'Construct ' . __FUNCTION__ .' / $Ordre = ' . $ParamCmd);
 		$AcNum = $this->getConfiguration('AcNum');
 		
 /* recuperation temperature consigne + passage en non decimal */
 		if ($ParamFamille == 'SETPTEMP' and $OrdreType== 'action'){
-          log::add('IntesisBoxWMP', 'debug', 'coucou');
+          log::add('IntesisBoxWMP', 'debug', 'Temperature consigne passée');
+		  $ConTemp = $ParamCmd;
          /* $cmd = $this->getCmd(null,'FANSP.4');
           if ($cmd ->getLogicalId()=='VANEUD') $Vane = $state_id;
    			$encTemp = getLogicalId()==;
@@ -544,12 +567,12 @@ class IntesisBoxWMP extends eqLogic {
 		
 	public function executeCommand ($cmd = '') {
 		log::add('IntesisBoxWMP', 'debug', 'BEGIN ' . __FUNCTION__ .' / $cmd = ' . $cmd);
-		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-		
+		//$eqLogic = $this->getEqLogic();
 		$ip = $this->getConfiguration('ip');
 		$PortCom = $this->getConfiguration('portCom');
 		$delay=500;
-		
+			
+		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 		if(socket_connect ($socket , $ip, $PortCom))
 		{
 			usleep($delay*1000);
@@ -558,20 +581,39 @@ class IntesisBoxWMP extends eqLogic {
 			
 			log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (' . $cmd . ')');
 			socket_write ($socket ,$cmd . "\r\n");
-			
-			usleep(500000);
+			$repack = socket_read($socket, 5);
+			log::add('IntesisBoxWMP', 'debug', 'Return reponse au ack (' . $repack . ')');
+          	usleep($delay*1000);
+			$reponse = socket_read($socket, 4096, PHP_NORMAL_READ);
+			log::add('IntesisBoxWMP', 'debug', 'Return reponse (' . $reponse . ')');
+			usleep($delay*1000);
 			log::add('IntesisBoxWMP', 'debug', 'CLOSING CONNECTION');
 			socket_close($socket);
 			log::add('IntesisBoxWMP', 'debug', 'CLOSED');
-			
+			//$eqLogic->updateInfo();
 		}
 		return false;
 	}
 	
-	public function returnCommand ()
-	{
+	/*public function updateInfo($return = '')
+    {
+		$AcNum = $this->getConfiguration('AcNum');
 		
-	}
+        try {
+            $infos = $this->getInfo();
+        } catch (\Exception $e) {
+            return;
+        }
+		
+        $cmd = $this->getCmd(null, 'input');
+        if (is_object($cmd) && isset($infos['InputFuncSelect'])) {
+            $value = $cmd->formatValue($infos['InputFuncSelect']);
+            if ($value != $cmd->execCmd(null, 2)) {
+                $cmd->setCollectDate('');
+                $cmd->event($value);
+            }
+        }
+    }*/
 	
 }
 
@@ -598,14 +640,21 @@ class IntesisBoxWMPCmd extends cmd {
                 $STtemp = $_options['slider'];
 				$this->setConfiguration('Ordre',$STtemp);
 		}
-		
-        $Param = $this->getConfiguration('Ordre');
-      	$Action = $this->getType();
-        $OrdreFamille=$this->getConfiguration('OrdreFamille');
-        $eqLogic = $this->getEqLogic();
-      log::add('IntesisBoxWMP', 'debug', 'Launch ' . __FUNCTION__ .' / $Param = ' . $Param.'+'.$Action.'+'.$OrdreFamille);
-		$eqLogic->CreateCommand($Param,$Action,$OrdreFamille);
-		}
+		/* marche pas
+		if ($_action == 'RefreshAction') {
+			log::add('IntesisBoxWMP', 'debug', 'Launch ' . __FUNCTION__ $_action);
+			$eqLogic->updateInfo();
+		}else{
+		*/
+			$Param = $this->getConfiguration('Ordre');
+			$Action = $this->getType();
+			$OrdreFamille=$this->getConfiguration('OrdreFamille');
+			$eqLogic = $this->getEqLogic();
+		  log::add('IntesisBoxWMP', 'debug', 'Launch ' . __FUNCTION__ .' / $Param = ' . $Param.'+'.$Action.'+'.$OrdreFamille);
+			$eqLogic->CreateCommand($Param,$Action,$OrdreFamille);
+			//$this->getLogicalId() == 'refresh';
+		/*}*/
+	}
     /*     * **********************Getteur Setteur*************************** */
 }
 
