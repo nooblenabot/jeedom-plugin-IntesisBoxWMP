@@ -545,7 +545,7 @@ class IntesisBoxWMP extends eqLogic {
 		}
 		
 		/* action ou info ? */
-		if($OrdreType == 'action' )
+		if($OrdreType == 'action' and $ParamFamille !='*'  )
           {
               $Action = 'SET';
 			  $Ordre = $ParamFamille.','.$ParamCmd;
@@ -554,6 +554,11 @@ class IntesisBoxWMP extends eqLogic {
           {
               $Action = 'GET';
 			  $Ordre = $ParamFamille;
+          }
+          elseif($ParamFamille =='*')
+          {
+          $Action = 'GET';
+		  $Ordre = $ParamFamille;
           }
         else
           {
@@ -567,10 +572,9 @@ class IntesisBoxWMP extends eqLogic {
 		
 	public function executeCommand ($cmd = '') {
 		log::add('IntesisBoxWMP', 'debug', 'BEGIN ' . __FUNCTION__ .' / $cmd = ' . $cmd);
-		//$eqLogic = $this->getEqLogic();
 		$ip = $this->getConfiguration('ip');
 		$PortCom = $this->getConfiguration('portCom');
-		$delay=500;
+		$delay=500000; /*in usec*/
 			
 		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 		if(socket_connect ($socket , $ip, $PortCom))
@@ -582,28 +586,23 @@ class IntesisBoxWMP extends eqLogic {
 			log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (' . $cmd . ')');
 			socket_write ($socket ,$cmd . "\r\n");
 			log::add('IntesisBoxWMP', 'debug', 'Commande ecrite');
-			          $buff = '';
-          //$bytes = socket_recv($socket, $buff, 174, MSG_PEEK/MSG_DONTWAIT);
-         $bytes = socket_recvmsg($socket, $buff);
-          log::add('IntesisBoxWMP', 'debug', 'Octets reponse (' . $bytes . ')');
-          log::add('IntesisBoxWMP', 'debug', 'Return reponse (' . $buff . ')');
-         // $bytes2 = socket_recv($socket, $buff2, 174, MSG_TRUNC/MSG_PEEK/MSG_DONTWAIT);
-          //          log::add('IntesisBoxWMP', 'debug', 'Octets reponse2 (' . $bytes2 . ')');
-          //log::add('IntesisBoxWMP', 'debug', 'Return reponse2 (' . $buff2 . ')');
-			log::add('IntesisBoxWMP', 'debug', 'Octets reponse (' . $bytes . ')');
-       	    log::add('IntesisBoxWMP', 'debug', 'Return reponse (' . $buff . ')');
-			usleep($delay*1000);
+			$buff = '';
+          	socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO,array('sec' => 1, 'usec' => $delay));
+         	$bytes = socket_recv($socket, $buff, 200,MSG_WAITALL);
+            log::add('IntesisBoxWMP', 'debug', 'Octets reponse (' . $bytes . ')');
+         	log::add('IntesisBoxWMP', 'debug', 'Return reponse (' . $buff . ')');
 			log::add('IntesisBoxWMP', 'debug', 'CLOSING CONNECTION');
 			socket_close($socket);
 			log::add('IntesisBoxWMP', 'debug', 'CLOSED');
-			//$eqLogic->updateInfo();
+			$this->executeCommand($buff,);
+			unset ($buff);
 		}
 		return false;
 	}
 	
-	/*public function updateInfo($return = '')
+	/*public function updateInfo($return = '',$cmd = '')
     {
-		$AcNum = $this->getConfiguration('AcNum');
+		//$AcNum = $this->getConfiguration('AcNum');
 		
         try {
             $infos = $this->getInfo();
@@ -619,6 +618,7 @@ class IntesisBoxWMP extends eqLogic {
                 $cmd->event($value);
             }
         }
+		unset ($cmd);
     }*/
 	
 }
