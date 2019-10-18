@@ -20,50 +20,13 @@ require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 function IntesisBoxWMP_install() {
 
-	/*
-    $cron = cron::byClassAndFunction('IntesisBoxWMP', 'check');
-	if (!is_object($cron)) {
-		$cron = new cron();
-		$cron->setClass('IntesisBoxWMP');
-		$cron->setFunction('check');
-		$cron->setEnable(1);
-		$cron->setDeamon(0);
-		$cron->setSchedule('*15 * * * *');
-		$cron->setTimeout(30);
-		$cron->save();
-	}
-	*/
 }
 
 function IntesisBoxWMP_update() {
-    /*$cron = cron::byClassAndFunction('IntesisBoxWMP', 'check');
-	if (!is_object($cron)) {
-		$cron = new cron();
-	}
-	$cron->setClass('IntesisBoxWMP');
-	$cron->setFunction('check');
-	$cron->setEnable(1);
-	$cron->setDeamon(0);
-	$cron->setSchedule('*15 * * * *');
-	$cron->setTimeout(30);
-	$cron->save();
-	$cron->stop();
-	foreach (IntesisBoxWMP::byType('IntesisBoxWMP') as $IntesisBoxWMP) {
-		$IntesisBoxWMP->save();
-	}
-	*/
 
 }
 
-
 function IntesisBoxWMP_remove() {
-
-    /*
-	$cron = cron::byClassAndFunction('IntesisBoxWMP', 'check');
-	if (is_object($cron)) {
-		$cron->remove();
-	}
-	*/
 
 }
 

@@ -9,12 +9,12 @@
 	"hasDependency" : false,
 	"hasOwnDeamon" : false,
 	"maxDependancyInstallTime" : 0,
-	"pluginVersion" : "0.1b",
-	"changelog" : "https://github.com/nooblenabot/jeedom-plugin-IntesisBoxWMP/wiki",
+	"pluginVersion" : "1.0.0",
+	"changelog" : "https://github.com/nooblenabot/jeedom-plugin-IntesisBoxWMP/commits/master",
 	"documentation" : "https://jeedom.github.io/plugin-template/#language#/",
 	"link" : {
-		"forum":"Lien vers le forum"
+		"forum":"https://community.jeedom.com/t/intesisboxwmp-gestion-des-climatiseur-et-pac-en-local-avec-les-boitiers-intesisbox/2596/5"
 	},
-	"language" : ["fr_FR","en_US"],
+	"language" : ["fr_FR"],
 	"compatibility" : ["miniplus","smart","rpi","docker","diy","mobile"]
 }
