@@ -57,6 +57,11 @@ class IntesisBoxWMP extends eqLogic {
     }
 
     public function postSave() {
+	$AcNum = $this->getConfiguration('AcNum');
+	$Date = date('d/m/Y H:i:s');
+	log::add('IntesisBoxWMP', 'debug', 'envoi date (' . $Date . ')');
+	$this->executeCommand('CFG,'.$AcNum.':DATETIME,'.$Date);
+	$this->executeCommand('GET,'.$AcNum.':*');
     }
 
     public function preUpdate() {
@@ -129,7 +134,6 @@ class IntesisBoxWMP extends eqLogic {
 		if($cmd->getValue()=='ONOFF') $cmd->setValue($EtatStatusId);
 		$cmd->save();
 		
-      
       	$cmd = $this->getCmd(null,'ONOFF.OFF');
         if (!is_object($cmd)) {
             $cmd = new IntesisBoxWMPCmd();
@@ -168,96 +172,25 @@ class IntesisBoxWMP extends eqLogic {
 		if ($cmd ->getLogicalId()=='MODE') $EtatModeId = $state_id;
 		$cmd->save();
 	 
-		$cmd = $this->getCmd(null,'MODE.AUTO');
+		$cmd = $this->getCmd(null,'MODE.CFG');
 		if (!is_object($cmd)) {
 			$cmd = new IntesisBoxWMPCmd();
-			$cmd->setLogicalId('MODE.AUTO');
+			$cmd->setLogicalId('MODE.CFG');
 			$cmd->setIsVisible(1);
-			$cmd->setName(__('Mode Auto', __FILE__));
+			$cmd->setName(__('Mode Fonctionnement', __FILE__));
 		}
 		$cmd->setType('action');
-		$cmd->setSubType('other');
+		$cmd->setSubType('select');
 		$cmd->setConfiguration('OrdreFamille','MODE');
-		$cmd->setConfiguration('Ordre','AUTO');
+		$cmd->setConfiguration('Ordre','');
 		$cmd->setValue('MODE');
-		$cmd->setConfiguration('listValue','AUTO|Mode Auto;HEAT|Mode Chaud;DRY|Mode Deshum;FAN|Mode Ventil;COOL|Mode Froid');
+		$cmd->setConfiguration('listValue','AUTO|Auto;HEAT|Chauffage;DRY|Deshumidification;FAN|Ventilation;COOL|refroidissement');
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
 		if($cmd->getValue()=='MODE') $cmd->setValue($EtatModeId);
 		$cmd->save();
-      /*
-      	$cmd = $this->getCmd(null,'MODE.HEAT');
-        if (!is_object($cmd)) {
-            $cmd = new IntesisBoxWMPCmd();
-            $cmd->setLogicalId('MODE.HEAT');
-            $cmd->setIsVisible(1);
-            $cmd->setName(__('Chaud', __FILE__));
-        }
-        $cmd->setType('action');
-        $cmd->setSubType('other');
-        $cmd->setConfiguration('OrdreFamille','MODE');
-		$cmd->setConfiguration('Ordre','HEAT');
-		$cmd->setDisplay('icon', '<i class="fa fa-power-off"></i>');
-		$cmd->setValue('MODE');
-        $cmd->setEqLogic_id($this->getId());
-        $cmd->save();
-		if($cmd->getValue()=='MODE') $cmd->setValue($EtatModeId);
-		$cmd->save();
-		
-		$cmd = $this->getCmd(null,'MODE.DRY');
-		if (!is_object($cmd)) {
-			$cmd = new IntesisBoxWMPCmd();
-			$cmd->setLogicalId('MODE.DRY');
-			$cmd->setIsVisible(1);
-			$cmd->setName(__('Deshum', __FILE__));
-		}
-		$cmd->setType('action');
-		$cmd->setSubType('other');
-		$cmd->setConfiguration('OrdreFamille','MODE');
-		$cmd->setConfiguration('Ordre','DRY');
-	 $cmd->setValue('MODE');
-		$cmd->setEqLogic_id($this->getId());
-		$cmd->save();
-		if($cmd->getValue()=='MODE') $cmd->setValue($EtatModeId);
-		$cmd->save();
-      
-      	$cmd = $this->getCmd(null,'MODE.FAN');
-        if (!is_object($cmd)) {
-            $cmd = new IntesisBoxWMPCmd();
-            $cmd->setLogicalId('MODE.FAN');
-            $cmd->setIsVisible(1);
-            $cmd->setName(__('Ventil', __FILE__));
-        }
-        $cmd->setType('action');
-        $cmd->setSubType('other');
-        $cmd->setConfiguration('OrdreFamille','MODE');
-		$cmd->setConfiguration('Ordre','FAN');
-		$cmd->setValue('MODE');
-        $cmd->setEqLogic_id($this->getId());
-        $cmd->save();
-		if($cmd->getValue()=='MODE') $cmd->setValue($EtatModeId);
-		$cmd->save();
-		
-		$cmd = $this->getCmd(null,'MODE.COOL');
-        if (!is_object($cmd)) {
-            $cmd = new IntesisBoxWMPCmd();
-            $cmd->setLogicalId('MODE.COOL');
-            $cmd->setIsVisible(1);
-            $cmd->setName(__('Froid', __FILE__));
-        }
-        $cmd->setType('action');
-        $cmd->setSubType('other');
-        $cmd->setConfiguration('OrdreFamille','MODE');
-		$cmd->setConfiguration('Ordre','COOL');
-		$cmd->setValue('MODE');
-        $cmd->setEqLogic_id($this->getId());
-        $cmd->save();
-		if($cmd->getValue()=='MODE') $cmd->setValue($EtatModeId);
-		$cmd->save();
-		*/
 		
 	/* Temperature de consigne */	
-		
 		
 		$cmd = $this->getCmd(null,'SETPTEMP');
 		if (!is_object($cmd)) {
@@ -272,7 +205,7 @@ class IntesisBoxWMP extends eqLogic {
 		$cmd->setConfiguration('OrdreFamille','SETPTEMP');
 		$cmd->setUnite('°C');
 		$cmd->setConfiguration('minValue',16);
-		$cmd->setConfiguration('setmaxValue',30);
+		$cmd->setConfiguration('maxValue',30);
 		$cmd->setEqLogic_id($this->getId());
 		$cmd->save();
 		$CTemp='';
@@ -280,10 +213,10 @@ class IntesisBoxWMP extends eqLogic {
 		if ($cmd ->getLogicalId()=='SETPTEMP') $Ctemp = $state_id;
 		$cmd->save();
 			
-		$cmd = $this->getCmd(null,'SETPTEMP.Act');
+		$cmd = $this->getCmd(null,'SETPTEMP.CFG');
         if (!is_object($cmd)) {
             $cmd = new IntesisBoxWMPCmd();
-            $cmd->setLogicalId('SETPTEMP.Act');
+            $cmd->setLogicalId('SETPTEMP.CFG');
             $cmd->setIsVisible(1);
             $cmd->setName(__('Consigne', __FILE__));
 			$cmd->setTemplate('dashboard','button');
@@ -300,18 +233,15 @@ class IntesisBoxWMP extends eqLogic {
         $cmd->save();
 		if($cmd->getValue()=='SETPTEMP') $cmd->setValue($Ctemp);
 		$cmd->save();
-			
-        
-     	  
+			 	  
 	  /* Ventilation Status */
 	  
-	        /*
 		$cmd = $this->getCmd(null,'FANSP');
         if (!is_object($cmd)) {
             $cmd = new IntesisBoxWMPCmd();
             $cmd->setLogicalId('FANSP');
             $cmd->setIsVisible(1);
-            $cmd->setName(__('Etat', __FILE__));
+            $cmd->setName(__('Etat Ventil.', __FILE__));
         }
         $cmd->setType('info');
         $cmd->setSubType('numeric');
@@ -321,82 +251,21 @@ class IntesisBoxWMP extends eqLogic {
         $cmd->save();
       
 	  	  
-		$cmd = $this->getCmd(null,'FANSP.AUTO');
+		$cmd = $this->getCmd(null,'FANSP.CFG');
         if (!is_object($cmd)) {
             $cmd = new IntesisBoxWMPCmd();
-            $cmd->setLogicalId('FANSP.AUTO');
+            $cmd->setLogicalId('FANSP.CFG');
             $cmd->setIsVisible(1);
-            $cmd->setName(__('Fan Auto', __FILE__));
+            $cmd->setName(__('Ventilation', __FILE__));
         }
         $cmd->setType('action');
-        $cmd->setSubType('other');
+        $cmd->setSubType('select');
         $cmd->setConfiguration('OrdreFamille','FANSP');
-		$cmd->setConfiguration('Ordre','AUTO');
-		//$cmd->setValue('Mode');
+		$cmd->setConfiguration('Ordre','');
+		$cmd->setConfiguration('listValue','AUTO|Auto;1|Silent;2|Faible;3|Moyen;4|Fort');
+		$cmd->setValue('FANSP');
         $cmd->setEqLogic_id($this->getId());
         $cmd->save();
-	  
-		$cmd = $this->getCmd(null,'FANSP.1');
-        if (!is_object($cmd)) {
-            $cmd = new IntesisBoxWMPCmd();
-            $cmd->setLogicalId('FANSP.1');
-            $cmd->setIsVisible(1);
-            $cmd->setName(__('Fan Silent', __FILE__));
-        }
-        $cmd->setType('action');
-        $cmd->setSubType('other');
-        $cmd->setConfiguration('OrdreFamille','FANSP');
-		$cmd->setConfiguration('Ordre','1');
-		//$cmd->setValue('Mode');
-        $cmd->setEqLogic_id($this->getId());
-        $cmd->save();
-		
-		$cmd = $this->getCmd(null,'FANSP.2');
-		if (!is_object($cmd)) {
-			$cmd = new IntesisBoxWMPCmd();
-			$cmd->setLogicalId('FANSP.2');
-			$cmd->setIsVisible(1);
-			$cmd->setName(__('Fan 1', __FILE__));
-		}
-		$cmd->setType('action');
-		$cmd->setSubType('other');
-		$cmd->setConfiguration('OrdreFamille','FANSP');
-		$cmd->setConfiguration('Ordre','2');
-	  //  $cmd->setValue('Mode');
-		$cmd->setEqLogic_id($this->getId());
-		$cmd->save();
-      
-      	$cmd = $this->getCmd(null,'FANSP.3');
-        if (!is_object($cmd)) {
-            $cmd = new IntesisBoxWMPCmd();
-            $cmd->setLogicalId('FANSP.3');
-            $cmd->setIsVisible(1);
-            $cmd->setName(__('Fan 2', __FILE__));
-        }
-        $cmd->setType('action');
-        $cmd->setSubType('other');
-        $cmd->setConfiguration('OrdreFamille','FANSP');
-		$cmd->setConfiguration('Ordre','3');
-		//$cmd->setValue('Mode');
-        $cmd->setEqLogic_id($this->getId());
-        $cmd->save();
-		
-		$cmd = $this->getCmd(null,'FANSP.4');
-        if (!is_object($cmd)) {
-            $cmd = new IntesisBoxWMPCmd();
-            $cmd->setLogicalId('FANSP.4');
-            $cmd->setIsVisible(1);
-            $cmd->setName(__('Fan 3', __FILE__));
-        }
-        $cmd->setType('action');
-        $cmd->setSubType('other');
-        $cmd->setConfiguration('OrdreFamille','FANSP');
-		$cmd->setConfiguration('Ordre','4');
-		//$cmd->setValue('Mode');
-        $cmd->setEqLogic_id($this->getId());
-        $cmd->save();
-	  */
-
 
 /* Creation commandes si presence des volets Horizontaux / Verticaux */
 /*
@@ -414,29 +283,27 @@ class IntesisBoxWMP extends eqLogic {
 			$cmd->setConfiguration('OrdreFamille','VANEUD');
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->save();
-		$Vane='';
-		$state_id = $cmd->getId();
-		if ($cmd ->getLogicalId()=='VANEUD') $Vane = $state_id;
-		$cmd->save();
+			$Vane='';
+			$state_id = $cmd->getId();
+			if ($cmd ->getLogicalId()=='VANEUD') $Vane = $state_id;
+			$cmd->save();
 			
-		$cmd = $this->getCmd(null,'VANEUD.4');
-        if (!is_object($cmd)) {
-            $cmd = new IntesisBoxWMPCmd();
-            $cmd->setLogicalId('VANEUD.4');
-            $cmd->setIsVisible(1);
-            $cmd->setName(__('Volet Auto', __FILE__));
-        }
-        $cmd->setType('action');
-        $cmd->setSubType('other');
-        $cmd->setConfiguration('OrdreFamille','VANEUD');
-		$cmd->setConfiguration('Ordre','4');
-		$cmd->setValue('VANEUD');
-        $cmd->setEqLogic_id($this->getId());
-		//$cmd->setConfiguration('listValue','5|Arrêt;6|Hors-Gel;4|Eco;8|Confort -2;7|Confort -1;3|Confort');
-        $cmd->save();
-		if($cmd->getValue()=='VANEUD') $cmd->setValue($Vane);
-		$cmd->save();
-			
+			$cmd = $this->getCmd(null,'VANEUD.4');
+			if (!is_object($cmd)) {
+				$cmd = new IntesisBoxWMPCmd();
+				$cmd->setLogicalId('VANEUD.4');
+				$cmd->setIsVisible(1);
+				$cmd->setName(__('Volet Auto', __FILE__));
+			}
+			$cmd->setType('action');
+			$cmd->setSubType('other');
+			$cmd->setConfiguration('OrdreFamille','VANEUD');
+			$cmd->setConfiguration('Ordre','4');
+			$cmd->setValue('VANEUD');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->save();
+			if($cmd->getValue()=='VANEUD') $cmd->setValue($Vane);
+			$cmd->save();
 		}
         */
 
@@ -464,18 +331,12 @@ class IntesisBoxWMP extends eqLogic {
 < [Tx]  GET,1:*
 > [rx]  LIMITS:VANEUD,[AUTO,SWING,PULSE]
 > [rx]  LIMITS:VANELR,[]
-> [rx]  LIMITS:SETPTEMP,[160,300]
-> [rx]  CHN,1:ONOFF,OFF
-> [rx]  CHN,1:MODE,HEAT
 > [rx]  CHN,1:FANSP,1
 > [rx]  CHN,1:VANEUD,AUTO
 > [rx]  CHN,1:VANELR,AUTO
-> [rx]  CHN,1:SETPTEMP,210
-> [rx]  CHN,1:AMBTEMP,285
 > [rx]  CHN,1:ERRSTATUS,OK
 > [rx]  CHN,1:ERRCODE,0
 */
-
     }
 
     public function preRemove() {
@@ -555,7 +416,10 @@ class IntesisBoxWMP extends eqLogic {
 			$this->updateInfo($buff);
 			unset ($buff);
 		}
+		else{
+		log::add('IntesisBoxWMP', 'debug', 'ERROR OPEN SOCKET : ' . $ip . ', PORT : ' . $PortCom . ')');
 		return false;
+		}
 	}
 	
 	public function updateInfo ($return = '')
@@ -610,6 +474,7 @@ class IntesisBoxWMP extends eqLogic {
                     		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' SETPTEMP' );
 							$info=strrchr($reponse,',');
                             $info = substr($info,1);
+							log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' Temperature recue : '.$info );
 							$info = $info/10;
                             log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' status : '.$info );
                             $comandeinfo = IntesisBoxWMPCmd::byEqLogicIdAndLogicalId($this->getId(),'SETPTEMP');
@@ -630,6 +495,7 @@ class IntesisBoxWMP extends eqLogic {
                         }
                       	else if(preg_match('#:ERRSTATUS,#', $reponse) == 1) {
                     		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' ERRSTATUS' );
+							
                         }
                         else if(preg_match('#:ERRCODE,#', $reponse) == 1) {
                     		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' ERRCODE' );
@@ -676,6 +542,11 @@ class IntesisBoxWMPCmd extends cmd {
 		if ($_action == 'SETPTEMP.Act') {
                 $STtemp = $_options['slider'];
 				$this->setConfiguration('Ordre',$STtemp);
+		}
+	/* surcharge pour choix Mode */
+		if ($_action == 'MODE.AUTO') {
+                $SMode = $_options['select'];
+				$this->setConfiguration('Ordre',$SMode);
 		}
 		/* marche pas
 		if ($_action == 'RefreshAction') {
