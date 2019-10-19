@@ -15,7 +15,6 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
 /*
  * Fonction pour l'ajout de commande, appellé automatiquement par plugin.template
@@ -25,6 +24,7 @@ $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder:
     var _cmd = {type: 'action', subType:'other'};
     addCmdToTable(_cmd);
 });
+
 function addCmdToTable(_cmd) {
     if (!isset(_cmd)) {
         var _cmd = {configuration: {}};
@@ -53,7 +53,10 @@ function addCmdToTable(_cmd) {
 			tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
         tr += '</td>';
         tr += '<td>';
+		if(!isset(_cmd.type) || _cmd.type == 'action' )
+			{
 			tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="Ordre" placeholder="{{Commande}}" style="margin-bottom : 5px;width : 70%; display : inline-block;" />';
+			}
 			tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="OrdreFamille" placeholder="{{Categorie de Commande}}" style="margin-bottom : 5px;width : 70%; display : inline-block;" />';
         tr += '</td>';
         tr += '<td>';
