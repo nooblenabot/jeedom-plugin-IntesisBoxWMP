@@ -57,11 +57,7 @@ class IntesisBoxWMP extends eqLogic {
     }
 
     public function postSave() {
-	$AcNum = $this->getConfiguration('AcNum');
-	$Date = date('d/m/Y H:i:s');
-	log::add('IntesisBoxWMP', 'debug', 'envoi date (' . $Date . ')');
-	$this->executeCommand('CFG,'.$AcNum.':DATETIME,'.$Date);
-	$this->executeCommand('GET,'.$AcNum.':*');
+
     }
 
     public function preUpdate() {
@@ -98,8 +94,7 @@ class IntesisBoxWMP extends eqLogic {
 	
 	 	$cmd = $this->getCmd(null,'ONOFF');
         if (!is_object($cmd)) {
-			log::add('IntesisBoxWMP', 'debug', 'Command n\'existe pas , creation (' . $cmd . ')');
-            $cmd = new IntesisBoxWMPCmd();
+			$cmd = new IntesisBoxWMPCmd();
             $cmd->setLogicalId('ONOFF');
             $cmd->setIsVisible(0);
             $cmd->setName(__('Etat', __FILE__));
@@ -244,14 +239,13 @@ class IntesisBoxWMP extends eqLogic {
             $cmd->setName(__('Etat Ventil.', __FILE__));
         }
         $cmd->setType('info');
-        $cmd->setSubType('numeric');
+        $cmd->setSubType('string');
 		$cmd->setDisplay('generic_type','GENERIC_INFO');
         $cmd->setConfiguration('OrdreFamille','FANSP');
 		$cmd->setEqLogic_id($this->getId());
         $cmd->save();
       
-	  	  
-		$cmd = $this->getCmd(null,'FANSP.CFG');
+	  	$cmd = $this->getCmd(null,'FANSP.CFG');
         if (!is_object($cmd)) {
             $cmd = new IntesisBoxWMPCmd();
             $cmd->setLogicalId('FANSP.CFG');
@@ -337,6 +331,18 @@ class IntesisBoxWMP extends eqLogic {
 > [rx]  CHN,1:ERRSTATUS,OK
 > [rx]  CHN,1:ERRCODE,0
 */
+
+/* Fait perdre la connection
+	$Date = date('d/m/Y H:i:s');
+	$this->executeCommand('CFG:DATETIME,'.$Date);
+	log::add('IntesisBoxWMP', 'debug', 'envoi date (' . $Date . ')');
+	*/
+	
+	$AcNum = $this->getConfiguration('AcNum');
+	if ($AcNum != ''){
+		$this->executeCommand('GET,'.$AcNum.':*');
+	}
+
     }
 
     public function preRemove() {
@@ -400,7 +406,7 @@ class IntesisBoxWMP extends eqLogic {
 		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 		if(socket_connect ($socket , $ip, $PortCom))
 		{
-			usleep($delay*1000);
+			usleep($delay);
 				log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (IP : ' . $ip . ', PORT : ' . $PortCom . ')');
 				log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (' . $cmd . ')');
 			socket_write ($socket ,$cmd . "\r\n");
@@ -463,9 +469,16 @@ class IntesisBoxWMP extends eqLogic {
                         }
                       	else if(preg_match('#:FANSP,#', $reponse) == 1) {
                     		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' FANSP' );
+							$info=strrchr($reponse,',');
+                            $info = substr($info,1);
+                            log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' status : '.$info );
+                            $comandeinfo = IntesisBoxWMPCmd::byEqLogicIdAndLogicalId($this->getId(),'FANSP');
+                          	$comandeinfo->event($info);
+                      		$comandeinfo->save();
+							unset ($comandeinfo);
                         }
           				else if(preg_match('#:VANEUD,#', $reponse) == 1) {
-                    		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' Ok' );
+                    		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' VANEUD' );
                         }
                         else if(preg_match('#:VANELR,#', $reponse) == 1) {
                     		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' VANELR' );
@@ -539,12 +552,12 @@ class IntesisBoxWMPCmd extends cmd {
 		$_action = $this->getLogicalId();
 		
 	/* surcharge pour consigne temperature */
-		if ($_action == 'SETPTEMP.Act') {
+		if ($_action == 'SETPTEMP.CFG') {
                 $STtemp = $_options['slider'];
 				$this->setConfiguration('Ordre',$STtemp);
 		}
 	/* surcharge pour choix Mode */
-		if ($_action == 'MODE.AUTO') {
+		if ($_action == 'MODE.CFG') {
                 $SMode = $_options['select'];
 				$this->setConfiguration('Ordre',$SMode);
 		}
