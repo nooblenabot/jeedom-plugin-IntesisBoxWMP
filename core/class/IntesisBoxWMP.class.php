@@ -27,6 +27,14 @@ class IntesisBoxWMP extends eqLogic {
 		  
       }
      */
+	 
+	/*
+	 * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom
+      public static function cron5() {
+		  
+		  
+      }
+     */
 
 
      /* Fonction exécutée automatiquement toutes les 15 minutes par Jeedom */
@@ -479,6 +487,15 @@ class IntesisBoxWMP extends eqLogic {
                         }
           				else if(preg_match('#:VANEUD,#', $reponse) == 1) {
                     		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' VANEUD' );
+							$info=strrchr($reponse,',');
+                            $info = substr($info,1);
+                            log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' status : '.$info );
+                            $comandeinfo = IntesisBoxWMPCmd::byEqLogicIdAndLogicalId($this->getId(),'FANSP');
+							if ($info != '' and $comandeinfo != '') {
+								$comandeinfo->event($info);
+								$comandeinfo->save();
+							}
+							unset ($comandeinfo);
                         }
                         else if(preg_match('#:VANELR,#', $reponse) == 1) {
                     		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' VANELR' );
@@ -533,6 +550,7 @@ class IntesisBoxWMP extends eqLogic {
 					}
                 }
 			}
+			log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' RE : FIN');
 		}			
     }
 	
@@ -560,6 +578,11 @@ class IntesisBoxWMPCmd extends cmd {
 		if ($_action == 'MODE.CFG') {
                 $SMode = $_options['select'];
 				$this->setConfiguration('Ordre',$SMode);
+		}
+	/* surcharge pour choix Ventilation */
+		if ($_action == 'FANSP.CFG') {
+                $SFan = $_options['select'];
+				$this->setConfiguration('Ordre',$SFan);
 		}
 		/* marche pas
 		if ($_action == 'RefreshAction') {
