@@ -435,7 +435,7 @@ class IntesisBoxWMP extends eqLogic {
 			unset ($buff);
 		}
 		else{
-		log::add('IntesisBoxWMP', 'debug', 'ERROR OPEN SOCKET : ' . $ip . ', PORT : ' . $PortCom . ')');
+		log::add('IntesisBoxWMP', 'warning', 'ERROR OPEN SOCKET : ' . $ip . ', PORT : ' . $PortCom . ')');
 		return false;
 		}
 	}
@@ -528,18 +528,18 @@ class IntesisBoxWMP extends eqLogic {
 							unset ($comandeinfo);
                         }
                       	else if(preg_match('#:ERRSTATUS,#', $reponse) == 1) {
-                    		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' ERRSTATUS' );
+                    		log::add('IntesisBoxWMP', 'info',__FUNCTION__.' ERRSTATUS' );
 							
                         }
                         else if(preg_match('#:ERRCODE,#', $reponse) == 1) {
-                    		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' ERRCODE' );
+                    		log::add('IntesisBoxWMP', 'info',__FUNCTION__.' ERRCODE' );
                         }
                       	else {
-                          log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' ERR UNDOCUMENTED' );
+                          log::add('IntesisBoxWMP', 'info',__FUNCTION__.' ERR UNDOCUMENTED' );
                         }
 					}
                   	else{
-						log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' Erreur de numero climatiseur' );
+						log::add('IntesisBoxWMP', 'info',__FUNCTION__.' Erreur de numero climatiseur' );
 					}
 				}
 				else {
