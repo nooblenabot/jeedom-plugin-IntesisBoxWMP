@@ -131,20 +131,20 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
 	<div class="form-group">
 		<label class="col-sm-3 control-label">{{Port Communication}}</label>
 		<div class="col-sm-3">
-			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="portCom" Value="3310" placeholder="3310"/>
+			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="portCom" placeholder="3310" disabled />
 		</div>
 	</div>
 	<div class="form-group">
 		<label class="col-sm-3 control-label">{{Identifiant Climatiseur}}</label>
 		<div class="col-sm-3">
-			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="AcNum" Value="1" placeholder="1"/>
+			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="AcNum" placeholder="1" disabled />
 		</div>
 	</div>
 	<div class="form-group">
       <label class="col-sm-3 control-label" ></label>
       <div class="col-sm-9">
-        <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="VANEUD" />{{Presence Volets UP/DONW}}</label>
-        <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="VANELR" />{{Presence Volets LEFT/RIGHT}}</label>
+        <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="VANEUD" display="none" />{{Presence Volets UP/DONW}}</label>
+        <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="VANELR" display="none" />{{Presence Volets LEFT/RIGHT}}</label>
       </div>
     </div>
   </fieldset>

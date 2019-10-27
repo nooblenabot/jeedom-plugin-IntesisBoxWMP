@@ -252,6 +252,10 @@ class IntesisBoxWMP extends eqLogic {
         $cmd->setConfiguration('OrdreFamille','FANSP');
 		$cmd->setEqLogic_id($this->getId());
         $cmd->save();
+		$FanSP='';
+		$state_id = $cmd->getId();
+		if ($cmd ->getLogicalId()=='FANSP') $FanSP = $state_id;
+		$cmd->save();
       
 	  	$cmd = $this->getCmd(null,'FANSP.CFG');
         if (!is_object($cmd)) {
@@ -268,6 +272,8 @@ class IntesisBoxWMP extends eqLogic {
 		$cmd->setValue('FANSP');
         $cmd->setEqLogic_id($this->getId());
         $cmd->save();
+		if($cmd->getValue()=='FANSP') $cmd->setValue($FanSP);
+		$cmd->save();
 
 /* Creation commandes si presence des volets Horizontaux / Verticaux */
 /*
@@ -340,12 +346,10 @@ class IntesisBoxWMP extends eqLogic {
 > [rx]  CHN,1:ERRCODE,0
 */
 
-/* Fait perdre la connection
 	$Date = date('d/m/Y H:i:s');
 	$this->executeCommand('CFG:DATETIME,'.$Date);
 	log::add('IntesisBoxWMP', 'debug', 'envoi date (' . $Date . ')');
-	*/
-	
+		
 	$AcNum = $this->getConfiguration('AcNum');
 	if ($AcNum != ''){
 		$this->executeCommand('GET,'.$AcNum.':*');
