@@ -41,7 +41,7 @@ La configuration/Ajout d'un equipement est accessible dans le menu plugin puis C
 
 voici les paramètres disponibles : 
 
-![configuration des equipements](../images/Config_object.png)
+![configuration des equipements](/docs/images/Config_object.png)
 
 * Nom de l'équipement IntesisBox : nom de votre équipement IntesisBox,
 * Objet parent : indique l'objet parent auquel appartient l'équipement,
@@ -63,7 +63,7 @@ voir [les specifications du boitier pour les commandes disponibles]( https://www
 
 Exemple avec la commande d'actualisation globale :
 
-![commande d'actualisation globale](../images/commande_globale.png)
+![commande d'actualisation globale](/docs/images/commande_globale.png)
 
 Une actualisation du plugin a lieu a chaque sauvegarde.
 
