@@ -27,6 +27,14 @@ class IntesisBoxWMP extends eqLogic {
 		  
       }
      */
+	 
+	/*
+	 * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom
+      public static function cron5() {
+		  
+		  
+      }
+     */
 
 
      /* Fonction exécutée automatiquement toutes les 15 minutes par Jeedom */
@@ -244,6 +252,10 @@ class IntesisBoxWMP extends eqLogic {
         $cmd->setConfiguration('OrdreFamille','FANSP');
 		$cmd->setEqLogic_id($this->getId());
         $cmd->save();
+		$FanSP='';
+		$state_id = $cmd->getId();
+		if ($cmd ->getLogicalId()=='FANSP') $FanSP = $state_id;
+		$cmd->save();
       
 	  	$cmd = $this->getCmd(null,'FANSP.CFG');
         if (!is_object($cmd)) {
@@ -260,6 +272,8 @@ class IntesisBoxWMP extends eqLogic {
 		$cmd->setValue('FANSP');
         $cmd->setEqLogic_id($this->getId());
         $cmd->save();
+		if($cmd->getValue()=='FANSP') $cmd->setValue($FanSP);
+		$cmd->save();
 
 /* Creation commandes si presence des volets Horizontaux / Verticaux */
 /*
@@ -332,12 +346,10 @@ class IntesisBoxWMP extends eqLogic {
 > [rx]  CHN,1:ERRCODE,0
 */
 
-/* Fait perdre la connection
 	$Date = date('d/m/Y H:i:s');
 	$this->executeCommand('CFG:DATETIME,'.$Date);
 	log::add('IntesisBoxWMP', 'debug', 'envoi date (' . $Date . ')');
-	*/
-	
+		
 	$AcNum = $this->getConfiguration('AcNum');
 	if ($AcNum != ''){
 		$this->executeCommand('GET,'.$AcNum.':*');
@@ -423,7 +435,7 @@ class IntesisBoxWMP extends eqLogic {
 			unset ($buff);
 		}
 		else{
-		log::add('IntesisBoxWMP', 'debug', 'ERROR OPEN SOCKET : ' . $ip . ', PORT : ' . $PortCom . ')');
+		log::add('IntesisBoxWMP', 'warning', 'ERROR OPEN SOCKET : ' . $ip . ', PORT : ' . $PortCom . ')');
 		return false;
 		}
 	}
@@ -479,6 +491,15 @@ class IntesisBoxWMP extends eqLogic {
                         }
           				else if(preg_match('#:VANEUD,#', $reponse) == 1) {
                     		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' VANEUD' );
+							$info=strrchr($reponse,',');
+                            $info = substr($info,1);
+                            log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' status : '.$info );
+                            $comandeinfo = IntesisBoxWMPCmd::byEqLogicIdAndLogicalId($this->getId(),'FANSP');
+							if ($info != '' and $comandeinfo != '') {
+								$comandeinfo->event($info);
+								$comandeinfo->save();
+							}
+							unset ($comandeinfo);
                         }
                         else if(preg_match('#:VANELR,#', $reponse) == 1) {
                     		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' VANELR' );
@@ -507,18 +528,18 @@ class IntesisBoxWMP extends eqLogic {
 							unset ($comandeinfo);
                         }
                       	else if(preg_match('#:ERRSTATUS,#', $reponse) == 1) {
-                    		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' ERRSTATUS' );
+                    		log::add('IntesisBoxWMP', 'info',__FUNCTION__.' ERRSTATUS' );
 							
                         }
                         else if(preg_match('#:ERRCODE,#', $reponse) == 1) {
-                    		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' ERRCODE' );
+                    		log::add('IntesisBoxWMP', 'info',__FUNCTION__.' ERRCODE' );
                         }
                       	else {
-                          log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' ERR UNDOCUMENTED' );
+                          log::add('IntesisBoxWMP', 'info',__FUNCTION__.' ERR UNDOCUMENTED' );
                         }
 					}
                   	else{
-						log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' Erreur de numero climatiseur' );
+						log::add('IntesisBoxWMP', 'info',__FUNCTION__.' Erreur de numero climatiseur' );
 					}
 				}
 				else {
@@ -533,6 +554,7 @@ class IntesisBoxWMP extends eqLogic {
 					}
                 }
 			}
+			log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' RE : FIN');
 		}			
     }
 	
@@ -560,6 +582,11 @@ class IntesisBoxWMPCmd extends cmd {
 		if ($_action == 'MODE.CFG') {
                 $SMode = $_options['select'];
 				$this->setConfiguration('Ordre',$SMode);
+		}
+	/* surcharge pour choix Ventilation */
+		if ($_action == 'FANSP.CFG') {
+                $SFan = $_options['select'];
+				$this->setConfiguration('Ordre',$SFan);
 		}
 		/* marche pas
 		if ($_action == 'RefreshAction') {
