@@ -4,7 +4,7 @@
 	"description" : "Plugin pour l'integration des interfaces IntesisBox",
 	"licence" : "AGPL",
 	"author" : "Nooblenabot",
-	"require" : "3.2",
+	"require" : "3.3",
 	"category" : "wellness",
 	"hasDependency" : false,
 	"hasOwnDeamon" : false,
