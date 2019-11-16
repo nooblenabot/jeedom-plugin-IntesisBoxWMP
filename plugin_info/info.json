@@ -13,7 +13,7 @@
 	"changelog" : "https://github.com/nooblenabot/jeedom-plugin-IntesisBoxWMP/commits/master",
 	"documentation" : "https://nooblenabot.github.io/jeedom-plugin-IntesisBoxWMP/#language#/",
 	"link" : {
-		"forum":"https://community.jeedom.com/t/intesisboxwmp-gestion-des-climatiseur-et-pac-en-local-avec-les-boitiers-intesisbox/2596/5"
+		"forum":"https://community.jeedom.com/t/intesisboxwmp-gestion-des-climatiseur-et-pac-en-local-avec-les-boitiers-intesisbox/2596"
 	},
 	"language" : ["fr_FR"],
 	"compatibility" : ["miniplus","smart","rpi","docker","diy","v4"]
