@@ -499,7 +499,9 @@ class IntesisBoxWMP extends eqLogic {
 								$comandeinfo->event($info);
 								$comandeinfo->save();
 							}
-							unset ($comandeinfo);*/
+							unset ($comandeinfo);
+							*/
+
                         }
                         else if(preg_match('#:VANELR,#', $reponse) == 1) {
                     		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' VANELR' );
