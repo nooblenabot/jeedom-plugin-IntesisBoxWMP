@@ -494,12 +494,13 @@ class IntesisBoxWMP extends eqLogic {
 							$info=strrchr($reponse,',');
                             $info = substr($info,1);
                             log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' status : '.$info );
-                            $comandeinfo = IntesisBoxWMPCmd::byEqLogicIdAndLogicalId($this->getId(),'VANEUD');
+                           /* $comandeinfo = IntesisBoxWMPCmd::byEqLogicIdAndLogicalId($this->getId(),'VANEUD');
 							if ($info != '' and $comandeinfo != '') {
 								$comandeinfo->event($info);
 								$comandeinfo->save();
 							}
 							unset ($comandeinfo);
+							*/
                         }
                         else if(preg_match('#:VANELR,#', $reponse) == 1) {
                     		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' VANELR' );
