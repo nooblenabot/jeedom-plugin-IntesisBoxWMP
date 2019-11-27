@@ -28,18 +28,21 @@ class IntesisBoxWMP extends eqLogic {
       }
      */
 	 
-	/*
-	 * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom
-      public static function cron5() {
-		  
-		  
-      }
-     */
-
+	/* Fonction exécutée automatiquement toutes les 5 minutes par Jeedom */
+    public static function cron5() {
+		foreach (eqLogic::byType('IntesisBoxWMP',true) as $IntesisBoxWMP) {
+				$AcNum = $IntesisBoxWMP->getConfiguration('AcNum');
+				$IntesisBoxWMP->executeCommand('GET,'.$AcNum.':AMBTEMP');
+		}		
+    }
 
      /* Fonction exécutée automatiquement toutes les 15 minutes par Jeedom */
-     /* public static function cron15() {
-      }
+    public static function cron15() {
+		foreach (eqLogic::byType('IntesisBoxWMP',true) as $IntesisBoxWMP) {
+			$AcNum = $IntesisBoxWMP->getConfiguration('AcNum');
+			$IntesisBoxWMP->executeCommand('GET,'.$AcNum.':*');
+		}
+    }
 
     /*
      * Fonction exécutée automatiquement toutes les heures par Jeedom
