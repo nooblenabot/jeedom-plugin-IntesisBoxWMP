@@ -20,13 +20,6 @@
 require_once __DIR__ . '/../../../../core/php/core.inc.php';
 
 class IntesisBoxWMP extends eqLogic {
-    /*
-     * Fonction exécutée automatiquement toutes les minutes par Jeedom
-      public static function cron() {
-		  
-		  
-      }
-     */
 	 
 	/* Fonction exécutée automatiquement toutes les 5 minutes par Jeedom */
     public static function cron5() {
@@ -43,12 +36,6 @@ class IntesisBoxWMP extends eqLogic {
 			$IntesisBoxWMP->executeCommand('GET,'.$AcNum.':*');
 		}
     }
-
-    /*
-     * Fonction exécutée automatiquement toutes les heures par Jeedom
-      public static function cronHourly() {
-      }
-     */
 
     /*
      * Fonction exécutée automatiquement tous les jours par Jeedom
@@ -76,30 +63,18 @@ class IntesisBoxWMP extends eqLogic {
         if ($this->getConfiguration('ip') == '') {
 			throw new Exception(__('Le champs IP ne peut etre vide', __FILE__));
 		}
-		    
-		$this->setConfiguration('portCom','3310');
-		$this->setConfiguration('AcNum','1');
+		
+		if ($this->getConfiguration('portCom') == '') {
+			$this->setConfiguration('portCom','3310');
+		}		
+
+		if ($this->getConfiguration('AcNum') == '') {
+			$this->setConfiguration('AcNum','1');
+		}
 		
 	}
 
     public function postUpdate() {
-		
-		/* Do Nothing
-		$cmd = $this->getCmd(null, 'RefreshAction');
-        if (!is_object($cmd)) {
-            $cmd = new IntesisBoxWMPCmd();
-        }
-        $cmd->setName(__('RefreshAction', __FILE__));
-        $cmd->setEqLogic_id($this->id);
-		$cmd->setLogicalId('RefreshAction');
-        $cmd->setType('action');
-        $cmd->setSubType('other');
-       	$cmd->setIsVisible(1);
- 				$cmd->setDisplay('icon', '<i class="fa fa-refresh"></i>');
- 				$cmd->setDisplay('showOndashboard', 1);
- 				$cmd->setDisplay('showNameOndashboard', 0);
-        $cmd->save();
-		*/
 		
 	/* Power on / off Status */
 	
@@ -164,7 +139,7 @@ class IntesisBoxWMP extends eqLogic {
         if (!is_object($cmd)) {
             $cmd = new IntesisBoxWMPCmd();
             $cmd->setLogicalId('MODE');
-            $cmd->setIsVisible(1);
+            $cmd->setIsVisible(0);
             $cmd->setName(__('Mode', __FILE__));
         }
         $cmd->setType('info');
@@ -226,9 +201,9 @@ class IntesisBoxWMP extends eqLogic {
             $cmd->setIsVisible(1);
             $cmd->setName(__('Consigne', __FILE__));
 			$cmd->setTemplate('dashboard','button');
+			$cmd->setSubType('slider');
         }
         $cmd->setType('action');
-        $cmd->setSubType('slider');
         $cmd->setConfiguration('OrdreFamille','SETPTEMP');
 		$cmd->setConfiguration('Ordre','');
 		$cmd->setDisplay('generic_type','THERMOSTAT_SET_SETPOINT');
@@ -246,7 +221,7 @@ class IntesisBoxWMP extends eqLogic {
         if (!is_object($cmd)) {
             $cmd = new IntesisBoxWMPCmd();
             $cmd->setLogicalId('FANSP');
-            $cmd->setIsVisible(1);
+            $cmd->setIsVisible(0);
             $cmd->setName(__('Etat Ventil.', __FILE__));
         }
         $cmd->setType('info');
@@ -339,13 +314,11 @@ class IntesisBoxWMP extends eqLogic {
 		}
 		
 /*
-< [Tx]  GET,1:*
 > [rx]  LIMITS:VANEUD,[AUTO,SWING,PULSE]
 > [rx]  LIMITS:VANELR,[]
 > [rx]  CHN,1:FANSP,1
 > [rx]  CHN,1:VANEUD,AUTO
 > [rx]  CHN,1:VANELR,AUTO
-> [rx]  CHN,1:ERRSTATUS,OK
 > [rx]  CHN,1:ERRCODE,0
 */
 
@@ -365,13 +338,6 @@ class IntesisBoxWMP extends eqLogic {
 
     public function postRemove() {
     }
-
-    /*
-     * Non obligatoire mais permet de modifier l'affichage du widget si vous en avez besoin
-      public function toHtml($_version = 'dashboard') {
-
-      }
-     */
 	 
     /*     * **********************Getteur Setteur*************************** */
 
@@ -533,7 +499,14 @@ class IntesisBoxWMP extends eqLogic {
 							unset ($comandeinfo);
                         }
                       	else if(preg_match('#:ERRSTATUS,#', $reponse) == 1) {
-                    		log::add('IntesisBoxWMP', 'info',__FUNCTION__.' ERRSTATUS' );
+							log::add('IntesisBoxWMP', 'info',__FUNCTION__.' ERRSTATUS' );
+							$info=strrchr($reponse,',');
+							$info = substr($info,1);
+							log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' status : '.$info );
+							$comandeinfo = IntesisBoxWMPCmd::byEqLogicIdAndLogicalId($this->getId(),'ERRSTATUS');
+							$comandeinfo->event($info);
+							$comandeinfo->save();
+						  	unset ($comandeinfo); 
 							
                         }
                         else if(preg_match('#:ERRCODE,#', $reponse) == 1) {
@@ -568,12 +541,6 @@ class IntesisBoxWMP extends eqLogic {
 class IntesisBoxWMPCmd extends cmd {
     /*     * *********************Methode d'instance************************* */
 
-    /*
-     * Non obligatoire permet de demander de ne pas supprimer les commandes même si elles ne sont pas dans la nouvelle configuration de l'équipement envoyé en JS
-      public function dontRemoveCmd() {
-      return true;
-      }
-     */
  
     public function execute($_options = array()) {
 		$_action = $this->getLogicalId();
@@ -593,19 +560,13 @@ class IntesisBoxWMPCmd extends cmd {
                 $SFan = $_options['select'];
 				$this->setConfiguration('Ordre',$SFan);
 		}
-		/* marche pas
-		if ($_action == 'RefreshAction') {
-			log::add('IntesisBoxWMP', 'debug', 'Launch ' . __FUNCTION__ $_action);
-			$eqLogic->CreateCommand('',action,*);
-		}else{
-		*/
+
 			$Param = $this->getConfiguration('Ordre');
 			$Action = $this->getType();
 			$OrdreFamille=$this->getConfiguration('OrdreFamille');
 			$eqLogic = $this->getEqLogic();
 		  log::add('IntesisBoxWMP', 'debug', 'Launch ' . __FUNCTION__ .' / $Param = ' . $Param.'+'.$Action.'+'.$OrdreFamille);
 			$eqLogic->CreateCommand($Param,$Action,$OrdreFamille);
-		/*}*/
 	}
 
 }
