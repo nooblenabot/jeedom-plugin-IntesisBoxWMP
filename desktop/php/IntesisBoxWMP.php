@@ -131,13 +131,13 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
 	<div class="form-group">
 		<label class="col-sm-3 control-label">{{Port Communication}}</label>
 		<div class="col-sm-3">
-			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="portCom" placeholder="3310" disabled />
+			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="portCom" placeholder="3310" />
 		</div>
 	</div>
 	<div class="form-group">
 		<label class="col-sm-3 control-label">{{Identifiant Climatiseur}}</label>
 		<div class="col-sm-3">
-			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="AcNum" placeholder="1" disabled />
+			<input type="text" class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="AcNum" placeholder="1" />
 		</div>
 	</div>
 	<div class="form-group">
