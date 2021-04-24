@@ -37,12 +37,6 @@ class IntesisBoxWMP extends eqLogic {
 		}
     }
 
-    /*
-     * Fonction exécutée automatiquement tous les jours par Jeedom
-      public static function cronDaily() {
-      }
-     */
-
     /*     * *********************Méthodes d'instance************************* */
 
     public function preInsert() {
