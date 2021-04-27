@@ -315,6 +315,7 @@ class IntesisBoxWMP extends eqLogic {
 				$cmd->setIsVisible(1);
 				$cmd->setName(__('Sante', __FILE__));
 			}
+			$cmd->setType('info');
 			$cmd->setSubType('string');
 		$cmd->setDisplay('generic_type','GENERIC_INFO');
         $cmd->setConfiguration('OrdreFamille','ERRSTATUS');
