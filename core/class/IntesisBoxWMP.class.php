@@ -394,9 +394,7 @@ class IntesisBoxWMP extends eqLogic {
 
   /*     * **********************Getteur Setteur*************************** */
 
-}
 
-class IntesisBoxWMPCmd extends cmd {
   /*     * *************************Attributs****************************** */
 
   /* construction de la commande */
@@ -617,6 +615,9 @@ class IntesisBoxWMPCmd extends cmd {
   }
   */
 
+}
+
+class IntesisBoxWMPCmd extends cmd {
   // Exécution d'une commande
   public function execute($_options = array()) {
 		$_action = $this->getLogicalId();
