@@ -1,58 +1,56 @@
 <?php
-
 /* This file is part of Jeedom.
- *
- * Jeedom is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Jeedom is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
- */
+*
+* Jeedom is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Jeedom is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /* * ***************************Includes********************************* */
-require_once __DIR__ . '/../../../../core/php/core.inc.php';
+require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 class IntesisBoxWMP extends eqLogic {
-	 
-	/* Fonction exécutée automatiquement toutes les 5 minutes par Jeedom */
-    public static function cron5() {
+
+  /* Fonction exécutée automatiquement toutes les 5 minutes par Jeedom */
+  public static function cron5() {
 		foreach (eqLogic::byType('IntesisBoxWMP',true) as $IntesisBoxWMP) {
 				$AcNum = $IntesisBoxWMP->getConfiguration('AcNum');
 				$IntesisBoxWMP->executeCommand('GET,'.$AcNum.':AMBTEMP');
 		}		
     }
 
-     /* Fonction exécutée automatiquement toutes les 15 minutes par Jeedom */
-    public static function cron15() {
+  /* Fonction exécutée automatiquement toutes les 15 minutes par Jeedom */
+  public static function cron15() {
 		foreach (eqLogic::byType('IntesisBoxWMP',true) as $IntesisBoxWMP) {
 			$AcNum = $IntesisBoxWMP->getConfiguration('AcNum');
 			$IntesisBoxWMP->executeCommand('GET,'.$AcNum.':*');
 		}
     }
 
-    /*     * *********************Méthodes d'instance************************* */
+  /*     * *********************Méthodes d'instance************************* */
 
-    public function preInsert() {
-    }
+  // Fonction exécutée automatiquement avant la création de l'équipement
+  public function preInsert() {
+  }
 
-    public function postInsert() {
-    }
+  // Fonction exécutée automatiquement après la création de l'équipement
+  public function postInsert() {
+  }
 
-    public function preSave() {
-    }
-
-    public function postSave() {
-
-    }
-
-    public function preUpdate() {
+  // Fonction exécutée automatiquement avant la mise à jour de l'équipement
+    // Fonction exécutée automatiquement avant la sauvegarde (création ou mise à jour) de l'équipement
+  public function preSave() {
+  }
+  public function preUpdate() {
 		
         if ($this->getConfiguration('ip') == '') {
 			throw new Exception(__('Le champs IP ne peut etre vide', __FILE__));
@@ -66,9 +64,10 @@ class IntesisBoxWMP extends eqLogic {
 			$this->setConfiguration('AcNum','1');
 		}
 		
-	}
+  }
 
-    public function postUpdate() {
+  // Fonction exécutée automatiquement après la mise à jour de l'équipement
+  public function postUpdate() {
 		
 	/* Power on / off Status */
 	
@@ -326,6 +325,26 @@ class IntesisBoxWMP extends eqLogic {
 		if ($cmd ->getLogicalId()=='ERRSTATUS') $EtatErrorId = $state_id;
 		$cmd->save();
 		}
+
+		if ($this->getConfiguration('IntesisBox_Type')!='IS-IR-WMP-1') {
+            $cmd = $this->getCmd(null,'ERRCODE');
+			if (!is_object($cmd)) {
+				$cmd = new IntesisBoxWMPCmd();
+				$cmd->setLogicalId('ERRCODE');
+				$cmd->setIsVisible(1);
+				$cmd->setName(__('ErrCode', __FILE__));
+			}
+			$cmd->setType('info');
+			$cmd->setSubType('string');
+		$cmd->setDisplay('generic_type','GENERIC_INFO');
+        $cmd->setConfiguration('OrdreFamille','ERRCODE');
+		$cmd->setEqLogic_id($this->getId());
+        $cmd->save();
+		$EtatErrorId='';
+		$state_id = $cmd->getId();
+		if ($cmd ->getLogicalId()=='ERRCODE') $EtatErrorId = $state_id;
+		$cmd->save();
+		}
 		
 /*
 > [rx]  LIMITS:VANEUD,[AUTO,SWING,PULSE]
@@ -345,16 +364,60 @@ class IntesisBoxWMP extends eqLogic {
 		$this->executeCommand('GET,'.$AcNum.':*');
 	}
 
-    }
+  }
 
-    public function preRemove() {
-    }
 
-    public function postRemove() {
-    }
-	 
-    /*     * **********************Getteur Setteur*************************** */
+  // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement
+  public function postSave() {
+  }
 
+  // Fonction exécutée automatiquement avant la suppression de l'équipement
+  public function preRemove() {
+  }
+
+  // Fonction exécutée automatiquement après la suppression de l'équipement
+  public function postRemove() {
+  }
+
+  /*
+  * Permet de crypter/décrypter automatiquement des champs de configuration des équipements
+  * Exemple avec le champ "Mot de passe" (password)
+  public function decrypt() {
+    $this->setConfiguration('password', utils::decrypt($this->getConfiguration('password')));
+  }
+  public function encrypt() {
+    $this->setConfiguration('password', utils::encrypt($this->getConfiguration('password')));
+  }
+  */
+
+  /*
+  * Permet de modifier l'affichage du widget (également utilisable par les commandes)
+  public function toHtml($_version = 'dashboard') {}
+  */
+
+  /*
+  * Permet de déclencher une action avant modification d'une variable de configuration du plugin
+  * Exemple avec la variable "param3"
+  public static function preConfig_param3( $value ) {
+    // do some checks or modify on $value
+    return $value;
+  }
+  */
+
+  /*
+  * Permet de déclencher une action après modification d'une variable de configuration du plugin
+  * Exemple avec la variable "param3"
+  public static function postConfig_param3($value) {
+    // no return value
+  }
+  */
+
+  /*     * **********************Getteur Setteur*************************** */
+
+
+  /*     * *************************Attributs****************************** */
+
+  /* construction de la commande */
 	public function CreateCommand ($ParamCmd = '',$OrdreType='',$ParamFamille='') {
 	/* Constantes */
 		log::add('IntesisBoxWMP', 'debug', 'Construct ' . __FUNCTION__ .' / $Ordre = ' . $ParamCmd);
@@ -392,6 +455,7 @@ class IntesisBoxWMP extends eqLogic {
 		$this->executeCommand($command);
 		}
 		
+  /* ouverture du port de communication */
 	public function executeCommand ($cmd = '') {
 		log::add('IntesisBoxWMP', 'debug', 'BEGIN ' . __FUNCTION__ .' / $cmd = ' . $cmd);
 		$ip = $this->getConfiguration('ip');
@@ -423,6 +487,7 @@ class IntesisBoxWMP extends eqLogic {
 		}
 	}
 	
+	/* Récupération des informations */
 	public function updateInfo ($return = '')
     {
 		if(!empty($return))
@@ -550,13 +615,26 @@ class IntesisBoxWMP extends eqLogic {
 		}			
     }
 	
+
+
+
+  /*     * ***********************Methode static*************************** */
+  public static $_widgetPossibility = array('custom' => true);
+
+  /*     * *********************Methode d'instance************************* */
+
+  /*
+  * Permet d'empêcher la suppression des commandes même si elles ne sont pas dans la nouvelle configuration de l'équipement envoyé en JS
+  public function dontRemoveCmd() {
+    return true;
+  }
+  */
+
 }
 
 class IntesisBoxWMPCmd extends cmd {
-    /*     * *********************Methode d'instance************************* */
-
- 
-    public function execute($_options = array()) {
+  // Exécution d'une commande
+  public function execute($_options = array()) {
 		$_action = $this->getLogicalId();
 		
 	/* surcharge pour consigne temperature */
@@ -581,6 +659,8 @@ class IntesisBoxWMPCmd extends cmd {
 			$eqLogic = $this->getEqLogic();
 		  log::add('IntesisBoxWMP', 'debug', 'Launch ' . __FUNCTION__ .' / $Param = ' . $Param.'+'.$Action.'+'.$OrdreFamille);
 			$eqLogic->CreateCommand($Param,$Action,$OrdreFamille);
-	}
+  }
+
+  /*     * **********************Getteur Setteur*************************** */
 
 }

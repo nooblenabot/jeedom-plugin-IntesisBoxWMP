@@ -23,8 +23,10 @@ if (!isConnect()) {
 }
 ?>
 
-<form class="form-horizontal">
+<!--
+  <form class="form-horizontal">
     <fieldset>
 
   </fieldset>
 </form>
+-->
