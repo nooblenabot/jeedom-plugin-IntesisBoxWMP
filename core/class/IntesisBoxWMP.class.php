@@ -598,13 +598,8 @@ class IntesisBoxWMP extends eqLogic {
 
 
 
-
-  /*
-  public static $_widgetPossibility = array();
-  */
-
   /*     * ***********************Methode static*************************** */
-
+  public static $_widgetPossibility = array('custom' => true);
 
   /*     * *********************Methode d'instance************************* */
 
