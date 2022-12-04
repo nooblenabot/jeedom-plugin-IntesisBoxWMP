@@ -325,6 +325,26 @@ class IntesisBoxWMP extends eqLogic {
 		if ($cmd ->getLogicalId()=='ERRSTATUS') $EtatErrorId = $state_id;
 		$cmd->save();
 		}
+
+		if ($this->getConfiguration('IntesisBox_Type')!='IS-IR-WMP-1') {
+            $cmd = $this->getCmd(null,'ERRCODE');
+			if (!is_object($cmd)) {
+				$cmd = new IntesisBoxWMPCmd();
+				$cmd->setLogicalId('ERRCODE');
+				$cmd->setIsVisible(1);
+				$cmd->setName(__('ErrCode', __FILE__));
+			}
+			$cmd->setType('info');
+			$cmd->setSubType('string');
+		$cmd->setDisplay('generic_type','GENERIC_INFO');
+        $cmd->setConfiguration('OrdreFamille','ERRCODE');
+		$cmd->setEqLogic_id($this->getId());
+        $cmd->save();
+		$EtatErrorId='';
+		$state_id = $cmd->getId();
+		if ($cmd ->getLogicalId()=='ERRCODE') $EtatErrorId = $state_id;
+		$cmd->save();
+		}
 		
 /*
 > [rx]  LIMITS:VANEUD,[AUTO,SWING,PULSE]
