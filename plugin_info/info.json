@@ -6,7 +6,7 @@
 	},
 	"licence" : "AGPL",
 	"author" : "Nooblenabot",
-	"require" : "3.3",
+	"require" : "4.3.7",
 	"category" : "wellness",
 	"hasDependency" : false,
 	"hasOwnDeamon" : false,

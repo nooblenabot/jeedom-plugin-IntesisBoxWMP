@@ -13,3 +13,4 @@ docs/.sass-cache/
 .remote-sync.json
 .vscode
 workspace.code-workspace
+.code-workspace
