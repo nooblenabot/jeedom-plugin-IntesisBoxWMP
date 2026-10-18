@@ -358,7 +358,7 @@ class IntesisBoxWMP extends eqLogic {
 	$Date = date('d/m/Y H:i:s');
 	$this->executeCommand('CFG:DATETIME,'.$Date);
 	log::add('IntesisBoxWMP', 'debug', 'envoi date (' . $Date . ')');
-	foreach (array('FANSP', 'MODE', 'SETPTEMP') as $function) {
+	foreach (array('FANSP', 'MODE', 'SETPTEMP', 'VANEUD', 'VANELR') as $function) {
 		$this->executeCommand('LIMITS:' . $function);
 	}
 		
@@ -541,21 +541,10 @@ class IntesisBoxWMP extends eqLogic {
 							unset ($comandeinfo);
                         }
           				else if(preg_match('#:VANEUD,#', $reponse) == 1) {
-                    		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' VANEUD' );
-							$info=strrchr($reponse,',');
-                            $info = substr($info,1);
-                            log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' status : '.$info );
-                           /* $comandeinfo = IntesisBoxWMPCmd::byEqLogicIdAndLogicalId($this->getId(),'VANEUD');
-							if ($info != '' and $comandeinfo != '') {
-								$comandeinfo->event($info);
-								$comandeinfo->save();
-							}
-							unset ($comandeinfo);
-							*/
-
+							$this->eventVane('VANEUD', $reponse);
                         }
                         else if(preg_match('#:VANELR,#', $reponse) == 1) {
-                    		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' VANELR' );
+							$this->eventVane('VANELR', $reponse);
                         }
                         else if(preg_match('#:SETPTEMP,#', $reponse) == 1) {
                     		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' SETPTEMP' );
@@ -656,6 +645,8 @@ class IntesisBoxWMP extends eqLogic {
 				$cmd->setConfiguration('maxValue', $max);
 				$cmd->save();
 			}
+		} else if ($function == 'VANEUD' || $function == 'VANELR') {
+			$this->ensureVane($function, $values);
 		}
 	}
 
@@ -673,6 +664,58 @@ class IntesisBoxWMP extends eqLogic {
 			return;
 		}
 		$cmd->setConfiguration('listValue', implode(';', $parts));
+		$cmd->save();
+	}
+
+	public function ensureVane($function, $values) {
+		if (count($values) == 0) {
+			return;
+		}
+		$name = ($function == 'VANEUD') ? __('Volet vertical', __FILE__) : __('Volet horizontal', __FILE__);
+		$info = $this->getCmd(null, $function);
+		if (!is_object($info)) {
+			$info = new IntesisBoxWMPCmd();
+			$info->setLogicalId($function);
+			$info->setEqLogic_id($this->getId());
+			$info->setName($name);
+		}
+		$info->setType('info');
+		$info->setSubType('string');
+		$info->setIsVisible(0);
+		$info->setConfiguration('OrdreFamille', $function);
+		$info->setEqLogic_id($this->getId());
+		$info->save();
+
+		$logicalId = $function . '.CFG';
+		$action = $this->getCmd(null, $logicalId);
+		if (!is_object($action)) {
+			$action = new IntesisBoxWMPCmd();
+			$action->setLogicalId($logicalId);
+			$action->setEqLogic_id($this->getId());
+			$action->setName($name);
+		}
+		$action->setType('action');
+		$action->setSubType('select');
+		$action->setIsVisible(1);
+		$action->setConfiguration('OrdreFamille', $function);
+		$action->setValue($info->getId());
+		$action->setEqLogic_id($this->getId());
+		$action->save();
+		$this->setListFromLimits($logicalId, $values, array(
+			'AUTO' => 'Auto',
+			'SWING' => 'Balayage',
+			'PULSE' => 'Impulsion',
+		));
+	}
+
+	public function eventVane($logicalId, $reponse) {
+		$info = substr(strrchr($reponse, ','), 1);
+		$cmd = IntesisBoxWMPCmd::byEqLogicIdAndLogicalId($this->getId(), $logicalId);
+		if (!is_object($cmd) || $info === '') {
+			return;
+		}
+		log::add('IntesisBoxWMP', 'debug', __FUNCTION__ . ' ' . $logicalId . ' ' . $info);
+		$cmd->event($info);
 		$cmd->save();
 	}
 	
@@ -712,6 +755,9 @@ class IntesisBoxWMPCmd extends cmd {
 		if ($_action == 'FANSP.CFG') {
                 $SFan = $_options['select'];
 				$this->setConfiguration('Ordre',$SFan);
+		}
+		if ($_action == 'VANEUD.CFG' || $_action == 'VANELR.CFG') {
+				$this->setConfiguration('Ordre', $_options['select']);
 		}
 
 			$Param = $this->getConfiguration('Ordre');
