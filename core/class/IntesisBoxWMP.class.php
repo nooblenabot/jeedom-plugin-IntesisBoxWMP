@@ -569,6 +569,9 @@ class IntesisBoxWMP extends eqLogic {
 							$info=strrchr($reponse,',');
                             $info = substr($info,1);
 							log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' Temperature recue : '.$info );
+							if ($info === '32768' || $info === '-32768') {
+								continue;
+							}
 							$info = $info/10;
                             log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' status : '.$info );
                             $comandeinfo = IntesisBoxWMPCmd::byEqLogicIdAndLogicalId($this->getId(),'SETPTEMP');
@@ -580,6 +583,9 @@ class IntesisBoxWMP extends eqLogic {
                     		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' AMBTEMP' );
 							$info=strrchr($reponse,',');
                             $info = substr($info,1);
+							if ($info === '32768' || $info === '-32768') {
+								continue;
+							}
 							$info = $info/10;
                             log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' status : '.$info );
                             $comandeinfo = IntesisBoxWMPCmd::byEqLogicIdAndLogicalId($this->getId(),'AMBTEMP');
