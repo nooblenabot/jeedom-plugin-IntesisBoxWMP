@@ -461,30 +461,35 @@ class IntesisBoxWMP extends eqLogic {
 		$ip = $this->getConfiguration('ip');
 		$PortCom = $this->getConfiguration('portCom');
 		$delay=500000; /*in usec*/
-			
-		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-		if(socket_connect ($socket , $ip, $PortCom))
-		{
+
+		for ($try = 0; $try < 2; $try++) {
+			$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+			if (!@socket_connect($socket, $ip, $PortCom)) {
+				log::add('IntesisBoxWMP', 'warning', 'ERROR OPEN SOCKET : ' . $ip . ', PORT : ' . $PortCom . ')');
+				socket_close($socket);
+				return false;
+			}
 			usleep($delay);
-				log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (IP : ' . $ip . ', PORT : ' . $PortCom . ')');
-				log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (' . $cmd . ')');
-			socket_write ($socket ,$cmd . "\r\n");
-				log::add('IntesisBoxWMP', 'debug', 'Commande ecrite');
+			log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (IP : ' . $ip . ', PORT : ' . $PortCom . ')');
+			log::add('IntesisBoxWMP', 'debug', 'CONNECTED, SENDING COMMAND (' . $cmd . ')');
+			socket_write($socket, $cmd . "\r");
 			$buff = '';
-          	socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO,array('sec' => 1, 'usec' => $delay));
-         	$bytes = socket_recv($socket, $buff, 200,MSG_WAITALL);
-				log::add('IntesisBoxWMP', 'debug', 'Octets reponse (' . $bytes . ')');
-				log::add('IntesisBoxWMP', 'debug', 'Return reponse (' . $buff . ')');
-				log::add('IntesisBoxWMP', 'debug', 'CLOSING CONNECTION');
+			$chunk = '';
+			socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => 2, 'usec' => 0));
+			while (($bytes = @socket_recv($socket, $chunk, 512, 0)) > 0) {
+				$buff .= $chunk;
+			}
+			log::add('IntesisBoxWMP', 'debug', 'Return reponse (' . trim($buff) . ')');
 			socket_close($socket);
-				log::add('IntesisBoxWMP', 'debug', 'CLOSED');
+			if ($try == 0 && strpos($buff, 'CLOSE:MAXCONN') !== false) {
+				log::add('IntesisBoxWMP', 'warning', 'CLOSE:MAXCONN ' . $ip . ', nouvel essai');
+				sleep(1);
+				continue;
+			}
 			$this->updateInfo($buff);
-			unset ($buff);
+			return true;
 		}
-		else{
-		log::add('IntesisBoxWMP', 'warning', 'ERROR OPEN SOCKET : ' . $ip . ', PORT : ' . $PortCom . ')');
 		return false;
-		}
 	}
 	
 	/* Récupération des informations */
@@ -493,7 +498,7 @@ class IntesisBoxWMP extends eqLogic {
 		if(!empty($return))
           $AcNum = $this->getConfiguration('AcNum');
 		{
-		$result=explode("\r\n",$return);
+		$result=preg_split("/\r\n|\n|\r/", $return);
 		log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' L'.__LINE__.' '. 'Nbre RE : '.count($result) );
 		foreach($result as $reponse)
 			{
