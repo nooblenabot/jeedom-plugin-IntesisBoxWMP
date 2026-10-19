@@ -487,6 +487,11 @@ class IntesisBoxWMP extends eqLogic {
 				continue;
 			}
 			$this->updateInfo($buff);
+			// Le boîtier ACK tout de suite. L'état ne suit qu'après quelques secondes.
+			if (preg_match('/^SET,(\d+):([A-Z]+),/', $cmd, $m)) {
+				sleep(3);
+				$this->executeCommand('GET,' . $m[1] . ':' . $m[2]);
+			}
 			return true;
 		}
 		return false;
