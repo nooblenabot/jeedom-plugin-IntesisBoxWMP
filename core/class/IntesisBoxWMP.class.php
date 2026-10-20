@@ -260,46 +260,6 @@ class IntesisBoxWMP extends eqLogic {
 		if($cmd->getValue()=='FANSP') $cmd->setValue($FanSP);
 		$cmd->save();
 
-/* Creation commandes si presence des volets Horizontaux / Verticaux */
-/*
-		if ($this->getConfiguration('VANEUD')=='1') {
-            $cmd = $this->getCmd(null,'VANEUD');
-			if (!is_object($cmd)) {
-				$cmd = new IntesisBoxWMPCmd();
-				$cmd->setLogicalId('VANEUD');
-				$cmd->setIsVisible(1);
-				$cmd->setName(__('Volet Horizontal', __FILE__));
-			}
-			$cmd->setType('info');
-			$cmd->setSubType('string');
-			$cmd->setDisplay('generic_type','GENERIC_INFO');
-			$cmd->setConfiguration('OrdreFamille','VANEUD');
-			$cmd->setEqLogic_id($this->getId());
-			$cmd->save();
-			$Vane='';
-			$state_id = $cmd->getId();
-			if ($cmd ->getLogicalId()=='VANEUD') $Vane = $state_id;
-			$cmd->save();
-			
-			$cmd = $this->getCmd(null,'VANEUD.4');
-			if (!is_object($cmd)) {
-				$cmd = new IntesisBoxWMPCmd();
-				$cmd->setLogicalId('VANEUD.4');
-				$cmd->setIsVisible(1);
-				$cmd->setName(__('Volet Auto', __FILE__));
-			}
-			$cmd->setType('action');
-			$cmd->setSubType('other');
-			$cmd->setConfiguration('OrdreFamille','VANEUD');
-			$cmd->setConfiguration('Ordre','4');
-			$cmd->setValue('VANEUD');
-			$cmd->setEqLogic_id($this->getId());
-			$cmd->save();
-			if($cmd->getValue()=='VANEUD') $cmd->setValue($Vane);
-			$cmd->save();
-		}
-        */
-
 /* Recuperation de temperature ambiante + retour erreurs si non infra-rouge */
  
 		if ($this->getConfiguration('IntesisBox_Type')!='IS-IR-WMP-1') {
@@ -612,13 +572,20 @@ class IntesisBoxWMP extends eqLogic {
                         }
                         else if(preg_match('#:ERRCODE,#', $reponse) == 1) {
                     		log::add('IntesisBoxWMP', 'info',__FUNCTION__.' ERRCODE' );
+							$info=strrchr($reponse,',');
+							$info = substr($info,1);
+							log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' status : '.$info );
+							$comandeinfo = IntesisBoxWMPCmd::byEqLogicIdAndLogicalId($this->getId(),'ERRCODE');
+							$comandeinfo->event($info);
+							$comandeinfo->save();
+						  	unset ($comandeinfo);
                         }
                       	else {
                           log::add('IntesisBoxWMP', 'info',__FUNCTION__.' ERR UNDOCUMENTED' );
                         }
 					}
                   	else{
-						log::add('IntesisBoxWMP', 'info',__FUNCTION__.' Erreur de numero climatiseur' );
+						log::add('IntesisBoxWMP', 'error',__FUNCTION__.' Erreur de numero climatiseur, vérifier dans la configuration' );
 					}
 				}
 				else if (preg_match('#^LIMITS:#i', $reponse) == 1) {
@@ -701,13 +668,13 @@ class IntesisBoxWMP extends eqLogic {
 		if (count($values) == 0) {
 			return;
 		}
-		$name = ($function == 'VANEUD') ? __('Volet vertical', __FILE__) : __('Volet horizontal', __FILE__);
+		$returnvotletname = ($function == 'VANEUD') ? __('Etat Volet vertical', __FILE__) : __('Etat Volet horizontal', __FILE__);
 		$info = $this->getCmd(null, $function);
 		if (!is_object($info)) {
 			$info = new IntesisBoxWMPCmd();
 			$info->setLogicalId($function);
 			$info->setEqLogic_id($this->getId());
-			$info->setName($name);
+			$info->setName($returnvotletname);
 		}
 		$info->setType('info');
 		$info->setSubType('string');
@@ -716,13 +683,14 @@ class IntesisBoxWMP extends eqLogic {
 		$info->setEqLogic_id($this->getId());
 		$info->save();
 
-		$logicalId = $function . '.CFG';
+		$logicalId = $function . ".CFG";
+		$commandvoletname = ($function == 'VANEUD') ? __('Cmd Volet vertical', __FILE__) : __('Cmd Volet horizontal', __FILE__);
 		$action = $this->getCmd(null, $logicalId);
 		if (!is_object($action)) {
 			$action = new IntesisBoxWMPCmd();
 			$action->setLogicalId($logicalId);
 			$action->setEqLogic_id($this->getId());
-			$action->setName($name);
+			$action->setName($commandvoletname);
 		}
 		$action->setType('action');
 		$action->setSubType('select');
