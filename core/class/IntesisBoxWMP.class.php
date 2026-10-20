@@ -372,6 +372,9 @@ class IntesisBoxWMP extends eqLogic {
 	$Date = date('d/m/Y H:i:s');
 	$this->executeCommand('CFG:DATETIME,'.$Date);
 	log::add('IntesisBoxWMP', 'debug', 'envoi date (' . $Date . ')');
+	foreach (array('FANSP', 'MODE', 'SETPTEMP') as $function) {
+		$this->executeCommand('LIMITS:' . $function);
+	}
 		
 	$AcNum = $this->getConfiguration('AcNum');
 	if ($AcNum != ''){
@@ -629,6 +632,9 @@ class IntesisBoxWMP extends eqLogic {
 						log::add('IntesisBoxWMP', 'info',__FUNCTION__.' Erreur de numero climatiseur' );
 					}
 				}
+				else if (preg_match('#^LIMITS:#i', $reponse) == 1) {
+					$this->applyLimits($reponse);
+				}
 				else {
                		if ($reponse == '') {
 						/* do noting */
@@ -644,6 +650,61 @@ class IntesisBoxWMP extends eqLogic {
 			log::add('IntesisBoxWMP', 'debug',__FUNCTION__.' RE : FIN');
 		}			
     }
+
+	public function applyLimits($reponse) {
+		if (!preg_match('/^LIMITS:([A-Z0-9]+),\[(.*)\]$/', trim($reponse), $m)) {
+			return;
+		}
+		$function = $m[1];
+		$raw = trim($m[2]);
+		$values = ($raw === '') ? array() : array_values(array_filter(array_map('trim', explode(',', $raw)), 'strlen'));
+		if ($function == 'FANSP') {
+			$this->setListFromLimits('FANSP.CFG', $values, array(
+				'AUTO' => 'Auto',
+				'1' => 'Faible',
+				'2' => 'Moyen',
+				'3' => 'Fort',
+				'4' => 'Très fort',
+			));
+		} else if ($function == 'MODE') {
+			$this->setListFromLimits('MODE.CFG', $values, array(
+				'AUTO' => 'Auto',
+				'HEAT' => 'Chauffage',
+				'DRY' => 'Deshumidification',
+				'FAN' => 'Ventilation',
+				'COOL' => 'refroidissement',
+			));
+		} else if ($function == 'SETPTEMP' && count($values) == 2 && is_numeric($values[0]) && is_numeric($values[1])) {
+			$min = $values[0] / 10;
+			$max = $values[1] / 10;
+			foreach (array('SETPTEMP', 'SETPTEMP.CFG') as $logicalId) {
+				$cmd = $this->getCmd(null, $logicalId);
+				if (!is_object($cmd)) {
+					continue;
+				}
+				$cmd->setConfiguration('minValue', $min);
+				$cmd->setConfiguration('maxValue', $max);
+				$cmd->save();
+			}
+		}
+	}
+
+	public function setListFromLimits($logicalId, $values, $labels) {
+		if (count($values) == 0) {
+			return;
+		}
+		$parts = array();
+		foreach ($values as $value) {
+			$label = isset($labels[$value]) ? $labels[$value] : $value;
+			$parts[] = $value . '|' . $label;
+		}
+		$cmd = $this->getCmd(null, $logicalId);
+		if (!is_object($cmd)) {
+			return;
+		}
+		$cmd->setConfiguration('listValue', implode(';', $parts));
+		$cmd->save();
+	}
 	
 
 
