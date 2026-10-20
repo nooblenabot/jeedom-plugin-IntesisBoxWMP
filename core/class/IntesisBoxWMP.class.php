@@ -84,6 +84,12 @@ class IntesisBoxWMP extends eqLogic {
 		$cmd->setDisplay('generic_type','GENERIC_INFO');
         $cmd->setConfiguration('OrdreFamille','ONOFF');
 		$cmd->setEqLogic_id($this->getId());
+		$cmd->setIsVisible(1);
+		$cmd->setTemplate('dashboard', 'toggle');
+		$cmd->setTemplate('mobile', 'toggle');
+		if ($cmd->getName() == 'Etat' || $cmd->getName() == __('Etat', __FILE__)) {
+			$cmd->setName(__('Marche', __FILE__));
+		}
         $cmd->save();
 		$EtatStatusId='';
 		$state_id = $cmd->getId();
@@ -104,6 +110,10 @@ class IntesisBoxWMP extends eqLogic {
 		$cmd->setConfiguration('Ordre','ON');
 		$cmd->setValue('ONOFF');
 		$cmd->setEqLogic_id($this->getId());
+		if ($cmd->getTemplate('dashboard') == '' || $cmd->getTemplate('dashboard') == 'circle') {
+			$cmd->setTemplate('dashboard', 'binarySwitch');
+			$cmd->setTemplate('mobile', 'binarySwitch');
+		}
 		$cmd->save();
 		if($cmd->getValue()=='ONOFF') $cmd->setValue($EtatStatusId);
 		$cmd->save();
@@ -122,6 +132,10 @@ class IntesisBoxWMP extends eqLogic {
 		$cmd->setConfiguration('Ordre','OFF');
 		$cmd->setValue('ONOFF');
 		$cmd->setEqLogic_id($this->getId());
+		if ($cmd->getTemplate('dashboard') == '' || $cmd->getTemplate('dashboard') == 'circle') {
+			$cmd->setTemplate('dashboard', 'binarySwitch');
+			$cmd->setTemplate('mobile', 'binarySwitch');
+		}
         $cmd->save();
 		if($cmd->getValue()=='ONOFF') $cmd->setValue($EtatStatusId);
 		$cmd->save();
